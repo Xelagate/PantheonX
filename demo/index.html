@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perps Lens</title>
+<style>
+  :root {
+    --bg: #0b0e14; --panel: #131822; --line: #232a38; --text: #e6e9ef; --muted: #8a93a6;
+    --accent: #7c5cff; --up: #22c55e; --down: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .panel { margin-bottom: 20px; overflow-x: auto; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  input { flex: 1 1 320px; min-width: 0; background: var(--bg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; font: inherit; font-family: ui-monospace, monospace; font-size: 13px; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font: inherit; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; font-size: 13px; }
+  th:first-child, td:first-child { text-align: left; }
+  tr.click { cursor: pointer; } tr.click:hover { background: #1a2030; }
+  .up { color: var(--up); } .down { color: var(--down); } .muted { color: var(--muted); }
+  .note { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .group h3 { font-size: 13px; color: var(--muted); font-weight: 500; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .chip { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .chip:last-child { border-bottom: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Perps Lens</h1>
+  <p class="sub">Ончейн-перпы на Solana рядом с твоей CEX. Живые данные Pacifica, только просмотр, без ключей.</p>
+
+  <div class="stats">
+    <div class="stat"><b id="s-vol">…</b><span>объём Pacifica за 24ч</span></div>
+    <div class="stat"><b id="s-markets">…</b><span>рынков</span></div>
+    <div class="stat"><b id="s-tradfi">…</b><span>из них не крипта: акции, сырьё, валюты</span></div>
+  </div>
+
+  <section class="panel">
+    <h2>Позиции кошелька</h2>
+    <form id="f">
+      <input id="wallet" placeholder="Solana-адрес кошелька" autocomplete="off" spellcheck="false">
+      <button>Показать</button>
+    </form>
+    <div id="positions" class="note">Введи адрес или кликни трейдера в таблице ниже.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Топ трейдеров Pacifica</h2>
+    <div id="leaders" class="note">Загрузка…</div>
+  </section>
+
+  <section class="panel">
+    <h2>Не только крипта</h2>
+    <div id="tradfi" class="groups note">Загрузка…</div>
+  </section>
+</main>
+<script>
+const API = "https://api.pacifica.fi/api/v1";
+// Non-crypto markets on Pacifica, grouped for display.
+const TRADFI = {
+  "Акции": ["NVDA", "TSLA", "GOOGL", "META", "PLTR", "HOOD", "MSTR", "CRCL", "MU", "SNDK", "SAMSUNG", "SKHYNIX", "SPCX"],
+  "Сырьё": ["XAU", "XAG", "PLATINUM", "COPPER", "CL", "NATGAS", "URNM"],
+  "Валюты и индексы": ["EURUSD", "USDJPY", "SP500"],
+};
+
+let marks = {};
+
+async function api(path) {
+  const r = await fetch(`${API}/${path}`);
+  const body = await r.json();
+  if (!body.success) throw new Error(body.error || r.status);
+  return body.data;
+}
+
+const usd = (n, d = 0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const compact = n => "$" + Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+const cls = n => (n >= 0 ? "up" : "down");
+const short = a => a.slice(0, 4) + "…" + a.slice(-4);
+const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+
+async function loadMarkets() {
+  const prices = await api("info/prices");
+  marks = Object.fromEntries(prices.map(p => [p.symbol, +p.mark]));
+  const bySym = Object.fromEntries(prices.map(p => [p.symbol, p]));
+  const tradfi = Object.values(TRADFI).flat().filter(s => bySym[s]);
+  document.getElementById("s-vol").textContent = compact(prices.reduce((a, p) => a + +p.volume_24h, 0));
+  document.getElementById("s-markets").textContent = prices.length;
+  document.getElementById("s-tradfi").textContent = tradfi.length;
+
+  document.getElementById("tradfi").innerHTML = Object.entries(TRADFI).map(([name, syms]) => `
+    <div class="group"><h3>${name}</h3>${syms.filter(s => bySym[s]).map(s => {
+      const p = bySym[s], chg = (+p.mark / +p.yesterday_price - 1) * 100;
+      return `<div class="chip"><span>${s}</span><span>${(+p.mark).toLocaleString("en-US")} <span class="${cls(chg)}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</span></span></div>`;
+    }).join("")}</div>`).join("");
+  document.getElementById("tradfi").classList.remove("note");
+}
+
+async function loadLeaders() {
+  const rows = await api("leaderboard?limit=10");
+  document.getElementById("leaders").innerHTML = `<table>
+    <tr><th>Трейдер</th><th>PnL 30д</th><th>PnL всё время</th><th>Объём 30д</th><th>Капитал</th></tr>
+    ${rows.map(r => `<tr class="${r.privacy_mode ? "" : "click"}" data-addr="${r.privacy_mode ? "" : esc(r.address)}">
+      <td>${esc(r.username || short(r.address))}${r.privacy_mode ? ' <span class="muted">🔒</span>' : ""}</td>
+      <td class="${cls(+r.pnl_30d)}">${usd(+r.pnl_30d)}</td>
+      <td class="${cls(+r.pnl_all_time)}">${usd(+r.pnl_all_time)}</td>
+      <td>${compact(+r.volume_30d)}</td>
+      <td>${compact(+r.equity_current)}</td></tr>`).join("")}
+  </table><p class="note">Кликни трейдера, чтобы увидеть его позиции. 🔒 — трейдер скрыл позиции.</p>`;
+  document.querySelectorAll("tr.click").forEach(tr => tr.onclick = () => {
+    document.getElementById("wallet").value = tr.dataset.addr;
+    showPositions(tr.dataset.addr);
+    document.getElementById("wallet").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+async function showPositions(wallet) {
+  const out = document.getElementById("positions");
+  out.className = "note";
+  out.textContent = "Загрузка…";
+  try {
+    const rows = await api(`positions?account=${encodeURIComponent(wallet)}`);
+    if (!rows.length) { out.textContent = "Открытых позиций нет."; return; }
+    let total = 0;
+    const body = rows.map(p => {
+      const size = +p.amount, entry = +p.entry_price, mark = marks[p.symbol] ?? entry;
+      const long = p.side === "bid", pnl = (mark - entry) * size * (long ? 1 : -1);
+      total += pnl;
+      return `<tr><td>${esc(p.symbol)}</td><td class="${long ? "up" : "down"}">${long ? "long" : "short"}</td>
+        <td>${size.toLocaleString("en-US")}</td><td>${compact(size * mark)}</td>
+        <td>${entry.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
+        <td>${mark.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
+        <td class="${cls(pnl)}">${usd(pnl, 2)}</td></tr>`;
+    }).join("");
+    out.className = "";
+    out.innerHTML = `<table>
+      <tr><th>Рынок</th><th>Сторона</th><th>Размер</th><th>Объём</th><th>Вход</th><th>Сейчас</th><th>PnL</th></tr>
+      ${body}
+      <tr><td colspan="6"><b>Итого нереализованный PnL</b></td><td class="${cls(total)}"><b>${usd(total, 2)}</b></td></tr>
+    </table><p class="note">PnL по текущей цене, без учёта накопленного funding.</p>`;
+  } catch (e) {
+    out.textContent = "Не удалось загрузить: " + e.message;
+  }
+}
+
+document.getElementById("f").onsubmit = e => {
+  e.preventDefault();
+  const w = document.getElementById("wallet").value.trim();
+  if (w) showPositions(w);
+};
+
+loadMarkets().catch(e => document.getElementById("tradfi").textContent = "Ошибка: " + e.message);
+loadLeaders().catch(e => document.getElementById("leaders").textContent = "Ошибка: " + e.message);
+</script>
+</body>
+</html>
