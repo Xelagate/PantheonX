@@ -40,13 +40,14 @@
   #order input, select { flex: 0 1 140px; }
   select { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: inherit; }
   button.ghost { background: transparent; border: 1px solid var(--accent); color: var(--text); }
+  a { color: var(--accent); }
   button.small { padding: 4px 10px; font-size: 13px; }
 </style>
 </head>
 <body>
 <main>
   <h1>Perps Lens<span id="net" class="badge" hidden>TESTNET</span></h1>
-  <p class="sub" id="sub">Ончейн-перпы на Solana рядом с твоей CEX. Живые данные Pacifica, только просмотр, без ключей.</p>
+  <p class="sub" id="sub">Ончейн-перпы на Solana рядом с твоей CEX. Живые данные Pacifica, только просмотр, без ключей. <a href="?net=testnet">Попробовать торговлю на testnet →</a></p>
 
   <div class="stats">
     <div class="stat"><b id="s-vol">…</b><span>объём Pacifica за 24ч</span></div>
@@ -65,6 +66,7 @@
       <button>Отправить</button>
     </form>
     <div id="o-status" class="note">Подключи Phantom, чтобы торговать. Каждый ордер подписывается в кошельке.</div>
+    <p class="note"><b>Подключай отдельный пустой кошелёк.</b> Подпись Pacifica не указывает сеть и 30 секунд действительна и на mainnet, поэтому не подписывай здесь кошельком с реальным депозитом на Pacifica. Тестовые средства: devnet SOL и USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).</p>
   </section>
 
   <section class="panel">
@@ -222,7 +224,7 @@ async function initTrading() {
     .map(s => `<option${s === "SOL" ? " selected" : ""}>${esc(s)}</option>`).join("");
   document.getElementById("connect").onclick = async () => {
     const phantom = window.phantom?.solana;
-    if (!phantom?.isPhantom) return status("Phantom не найден: нужно расширение Phantom, а страницу открывать через http://localhost, не как файл.");
+    if (!phantom?.isPhantom) return status("Phantom не найден: установи расширение Phantom (phantom.com) и обнови страницу. Как локальный файл страница не работает — только через http(s).");
     try {
       trader = (await phantom.connect()).publicKey.toString();
     } catch { return status("Подключение отменено."); }
