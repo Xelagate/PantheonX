@@ -5,3 +5,12 @@ __pycache__/
 .venv/
 .DS_Store
 .secrets/
+
+# Internal material that must never land in this public repo
+docs/
+*.pdf
+*.png
+*.jpg
+*.MOV
+*.mov
+*.ogg
