@@ -1,30 +1,46 @@
-# Perps Lens
+# PantheonX — Perps Lens
 
-Solana perpetuals on [Pacifica](https://pacifica.fi) next to the CEX view a trader already uses:
-positions and PnL by wallet, funding compared with Binance, and market orders signed in Phantom.
+All your perps in one window: Pacifica (Solana on-chain perps) next to Binance USDT-M Futures,
+one portfolio and one order ticket.
 
-Live demo: https://xelagate.github.io/perps-lens-demo/ (read-only, mainnet data).
-Testnet trading: https://xelagate.github.io/perps-lens-demo/?net=testnet
+Live: https://pantheonx.trade
 
 Built for the Colosseum Crypto World's Fair hackathon (Sep–Oct 2026).
+
+## What it does
+
+- **Trade** — connect Phantom (Pacifica) and a Binance futures API key, see positions and PnL across
+  both venues, open and close market orders from one ticket.
+- **Market** — live Pacifica markets, funding compared with Binance (% per 8h), top traders.
+- **Screener** — Binance perps table over PantheonX's screener service: sort, search, live updates;
+  clicking a coin fills the ticket.
+- **Order Flow** — PantheonX's order-flow tool, embedded.
+
+Safety: Pacifica trading runs on **testnet** (use a separate empty wallet). Binance **Mainnet trades
+real money** — every opening order is confirmed and capped at $50. Use a key with Futures only, no
+Withdraw. The key stays in the browser tab and is sent only to Binance. Binance Demo keys are
+view-only (Binance Demo blocks browser orders via CORS).
 
 ## What is here
 
 | Path | What |
 |---|---|
-| `demo/index.html` | Static page, no build step: wallet positions and PnL, top traders, markets; on `?net=testnet` connect Phantom and open/close market orders |
-| `demo/pacifica-sign.js` | Pacifica order signing (canonical JSON + ed25519, base58), shared by the page and the scripts |
-| `demo/pacifica-sign.test.mjs` | Tests against the reference string from Pacifica's docs |
-| `perps_lens.py` | Read-only CLI: `positions <wallet>`, `funding [top_n]` (Pacifica vs Binance), stdlib only |
-| `scripts/new-testnet-wallet.mjs` | Generates a throwaway testnet wallet into gitignored `.secrets/` |
-| `scripts/testnet-order.mjs` | Opens and closes a minimum testnet market order with that wallet |
+| `demo/index.html` | Static page, no build step, no backend (EN / RU / UK) |
+| `demo/pacifica.js`, `demo/pacifica-sign.js` | Pacifica REST and order signing (canonical JSON + ed25519, base58) |
+| `demo/binance.js` | Binance USDT-M futures REST with HMAC signing, venue adapter |
+| `demo/funding.js` | Funding comparison Pacifica vs Binance |
+| `demo/ticket.js` | Order checks shared by both venues: lot rounding, minimums, Mainnet cap |
+| `demo/*.test.mjs` | Unit tests |
+| `perps_lens.py` | Read-only CLI: `positions <wallet>`, `funding [top_n]`, stdlib only |
+| `scripts/` | Live probes: throwaway testnet wallet, Pacifica testnet order, Binance Demo order |
 
 ## Run
 
 ```sh
-node --test demo/pacifica-sign.test.mjs
+node --test demo/*.test.mjs
 python3 perps_lens.py funding 10
-python3 -m http.server -d demo 8000   # then open http://localhost:8000/?net=testnet
+python3 -m http.server -d demo 8000   # then open http://localhost:8000/
 ```
 
-Trading is testnet only. Use a separate test wallet, never a wallet holding real funds.
+`scripts/binance-demo-order.mjs` reads `BINANCE_DEMO_KEY` / `BINANCE_DEMO_SECRET` from `.env`
+(see `.env.example`).

@@ -1,187 +1,878 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Perps Lens</title>
+<title>PantheonX</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171723'/%3E%3Csvg x='4' y='4' width='24' height='24' viewBox='1318.8 357 238.4 238.4'%3E%3Cpath fill='%23D1CFE9' fill-rule='evenodd' d='M1423.88 432.16L1378.70 386.98C1370.45 378.73 1357.07 378.73 1348.82 386.98C1340.57 395.23 1340.57 408.61 1348.82 416.86L1363.98 432.02C1380.48 448.30 1406.96 448.46 1423.65 432.38L1423.88 432.16M1357.00 513.31L1364.00 520.31L1348.82 535.50C1340.57 543.75 1340.57 557.13 1348.82 565.38C1357.07 573.63 1370.45 573.63 1378.70 565.38L1423.96 520.12L1423.67 519.82C1407.09 503.46 1380.39 503.66 1364.06 520.26L1357.00 513.31M1527.21 386.98C1518.97 378.73 1505.58 378.73 1497.33 386.98L1444.95 439.36L1437.39 446.64C1412.95 470.19 1374.18 469.95 1350.04 446.10L1357.00 439.05L1349.99 446.05L1334.81 430.87C1318.82 414.88 1318.82 388.96 1334.81 372.97C1350.79 356.98 1376.71 356.98 1392.70 372.97L1438.02 418.28L1483.33 372.97C1499.32 356.98 1525.24 356.98 1541.22 372.97C1557.21 388.96 1557.21 414.88 1541.22 430.87L1495.91 476.18L1541.22 521.49C1557.21 537.48 1557.21 563.40 1541.22 579.39C1525.24 595.37 1499.32 595.37 1483.33 579.39L1438.02 534.07L1392.70 579.39C1376.71 595.37 1350.79 595.37 1334.81 579.39C1318.82 563.40 1318.82 537.48 1334.81 521.49L1349.97 506.33C1373.98 481.96 1413.21 481.68 1437.57 505.72L1445.02 513.06L1497.33 565.38C1505.58 573.63 1518.97 573.63 1527.21 565.38C1535.46 557.13 1535.46 543.75 1527.21 535.50L1467.90 476.18L1527.21 416.86C1535.46 408.61 1535.46 395.23 1527.21 386.98'/%3E%3C/svg%3E%3C/svg%3E">
 <style>
-  :root {
-    --bg: #0b0e14; --panel: #131822; --line: #232a38; --text: #e6e9ef; --muted: #8a93a6;
-    --accent: #7c5cff; --up: #22c55e; --down: #ef4444;
-  }
+  @font-face { font-family: 'Montserrat'; src: url('./fonts/montserrat-latin-wght.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+  :root { color-scheme: dark;
+    --bg: #171723; --panel: #242433; --deep: #13131b; --line: #33334b; --text: #d2d2ff; --head: #fff; --muted: #a7a7ca; --dim: #58587b;
+    --accent: #6a56e4; --accent-hi: #8a7bf0; --up: #3ddc84; --down: #ff6b6b; --warn: #ff8ac6;
+    --mainnet: var(--down); --testnet: #b4acf0; --off: var(--dim);
+    --pacifica: #61d7ef; --pacifica-bg: #0e1724; --binance: #f0b90b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace; --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { font-size: 26px; margin: 0 0 4px; }
-  h2 { font-size: 17px; margin: 0 0 12px; }
-  .sub { color: var(--muted); margin: 0 0 24px; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .stat, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-  .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
-  .stat span { color: var(--muted); font-size: 13px; }
-  .panel { margin-bottom: 20px; overflow-x: auto; }
-  form { display: flex; gap: 8px; flex-wrap: wrap; }
-  input { flex: 1 1 320px; min-width: 0; background: var(--bg); color: var(--text); border: 1px solid var(--line);
-    border-radius: 8px; padding: 10px 12px; font: inherit; font-family: ui-monospace, monospace; font-size: 13px; }
-  button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font: inherit; cursor: pointer; }
-  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  th { color: var(--muted); font-weight: 500; font-size: 13px; }
-  th:first-child, td:first-child { text-align: left; }
-  tr.click { cursor: pointer; } tr.click:hover { background: #1a2030; }
-  .up { color: var(--up); } .down { color: var(--down); } .muted { color: var(--muted); }
-  .note { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 500 15px/1.5 Montserrat, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  main.wrap { padding-bottom: 48px; }
+  h1, h2 { color: var(--head); letter-spacing: .02em; }
+  h1 { font-size: 26px; font-weight: 800; margin: 0; line-height: 1.1; }
+  h2 { font-size: 16px; font-weight: 700; margin: 0 0 14px; }
+  a { color: var(--accent-hi); }
+  :focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+
+  body > header { border-bottom: 1px solid var(--line); }
+  body > header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 22px; padding-bottom: 18px; }
+  .brand { display: flex; align-items: center; gap: 12px; flex: 1 1 auto; }
+  .brand svg { width: 36px; height: 36px; flex: none; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .brand .by { color: var(--text); white-space: nowrap; }
+  .head-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+
+  /* Brand colour = WHICH venue (logo, name, stripe). Network colour = WHICH money (red Mainnet, neutral dashed testnet/demo). Never the same hue. */
+  .logo { width: 20px; height: 20px; flex: none; display: inline-block; vertical-align: middle; border-radius: 6px; overflow: hidden; }
+  .logo.lg { width: 30px; height: 30px; border-radius: 8px; }
+  .vn { font-weight: 800; }
+  .vn.pac { color: var(--pacifica); } .vn.bn { color: var(--binance); }
+
+  /* Venue badges: frame = network of the connected client. */
+  .badge { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); white-space: nowrap; letter-spacing: .02em; }
+  .badge.real { border-color: var(--mainnet); color: #fff; background: rgba(255, 107, 107, .16); }
+  .badge.test { border: 1px dashed rgba(180, 172, 240, .55); color: var(--testnet); background: none; }
+  .badge.off { border-style: dashed; color: var(--dim); }
+  a.badge { text-decoration: none; cursor: pointer; transition: border-color 150ms ease, background-color 150ms ease; padding: 4px 12px 4px 5px; }
+  a.badge:hover { border-color: var(--accent-hi); }
+  a.badge .nw { color: var(--muted); }
+  .badge.real .nw { color: #fff; } .badge.test .nw { color: var(--testnet); }
+  .badge.off .vn { color: var(--muted); }
+  .badge.off .logo { filter: grayscale(1); opacity: .55; }
+
+  /* Connections pill (top right, like Connect Wallet on DEXes): accent "Connect" when empty, one chip per connected venue otherwise. */
+  .conn { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 5px 16px; }
+  .conn.on { background: var(--deep); border-color: var(--line); color: var(--text); padding: 4px 6px; }
+  .conn.on:hover { border-color: var(--accent-hi); background: var(--deep); }
+  .conn .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 3px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .04em; color: var(--testnet); border: 1px dashed rgba(180, 172, 240, .45); }
+  .conn .chip.real { color: #fff; background: rgba(255, 107, 107, .16); border: 1px solid var(--mainnet); }
+  .conn .plus { width: 28px; height: 28px; display: inline-grid; place-items: center; border-radius: 50%; color: var(--muted); font-size: 18px; font-weight: 600; line-height: 1; }
+  .conn.on:hover .plus { color: var(--head); }
+
+  /* Connections dialog: the two account cards, opened from the pill. */
+  #conn-dlg { width: min(880px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 1px solid var(--line); border-radius: 20px; background: var(--bg); color: var(--text); }
+  #conn-dlg::backdrop { background: rgba(8, 8, 14, .66); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  #conn-dlg[open] { animation: dlg-in 220ms var(--ease-out); }
+  @keyframes dlg-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+  .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 22px 0; }
+  .dlg-head h2 { margin: 0; font-size: 18px; }
+  .dlg-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .dlg-x { width: 36px; height: 36px; padding: 0; display: grid; place-items: center; font-size: 20px; font-weight: 500; }
+  #conn-dlg #accounts { padding: 18px 22px 22px; }
+
+  /* Theon, the PantheonX mascot: onboarding (cyan = "act on plan") and risk notes (amber = "check the risks"), per the brand book. */
+  .theon { display: block; height: auto; pointer-events: none; user-select: none; }
+  .empty-card.has-theon { grid-template-columns: auto minmax(0, 440px); justify-content: center; justify-items: start; text-align: left; column-gap: 36px; }
+  .empty-card .theon { grid-row: 1 / span 4; width: 132px; filter: drop-shadow(0 0 22px rgba(0, 245, 255, .28)); }
+  .empty-card.has-theon .venues-mini { justify-content: flex-start; }
+  .theon-warn { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 4px; border-radius: 12px; background: rgba(240, 185, 11, .07); border: 1px solid rgba(240, 185, 11, .28); }
+  .theon-warn .theon { width: 40px; flex: none; filter: drop-shadow(0 0 8px rgba(253, 191, 28, .35)); }
+  .warn-line.theon-warn b::before { content: none; }
+
+  /* Language switch */
+  #lang { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--deep); border: 1px solid var(--line); }
+  #lang button { min-height: 30px; padding: 4px 11px; font-size: 12px; font-weight: 800; letter-spacing: .04em; border: 0; background: none; color: var(--muted); border-radius: 999px; }
+  #lang button:hover { color: var(--head); background: rgba(106, 86, 228, .15); }
+  #lang button[aria-pressed="true"] { background: var(--panel); color: var(--head); box-shadow: inset 0 0 0 1px var(--line); }
+
+  /* Tabs */
+  #tabs { position: sticky; top: 0; z-index: 5; background: rgba(23, 23, 35, .92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+  #tabs .wrap { display: flex; gap: 4px; }
+  #tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 0; background: none;
+    color: var(--muted); font-size: 14px; font-weight: 700; box-shadow: inset 0 -2px 0 transparent; }
+  #tabs button:hover { color: var(--head); background: none; }
+  #tabs button:active { transform: none; }
+  #tabs button[aria-selected="true"] { color: var(--head); box-shadow: inset 0 -2px 0 var(--accent-hi); }
+  #tabs .count { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; background: var(--deep); color: var(--muted); }
+  #tabs .alert { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-hi); }
+
+  /* Layout: portfolio left, sticky ticket right; one column below 1000px with the portfolio first. */
+  .top { display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-areas: "port ticket"; gap: 20px; align-items: start; }
+  #portfolio { grid-area: port; min-width: 0; }
+  .ticket-col { grid-area: ticket; position: sticky; top: 64px; }
+
+  .panel { background: var(--panel); border-radius: 16px; padding: 20px 22px; margin-bottom: 20px; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .panel-head h2 { margin: 0; }
+  .panel-head span { color: var(--muted); font-size: 12px; font-weight: 600; }
+
+  /* Empty state: one card instead of three hints. */
+  .empty-card { display: grid; justify-items: center; text-align: center; gap: 10px; padding: 56px 24px; border: 1px dashed var(--line); background: none; }
+  .empty-card h2 { margin: 0; font-size: 20px; }
+  .empty-card p { margin: 0; color: var(--muted); max-width: 440px; }
+  .empty-card .venues-mini { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 6px 0 4px; }
+  .empty-card button { min-height: 44px; padding: 10px 28px; }
+
+  /* Balances: per venue, never summed (test and real money must not add up). Brand stripe, network tag. */
+  #balances { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .bal { background: var(--deep); border-radius: 12px; padding: 14px 16px; border-left: 3px solid var(--off); }
+  .bal.pac { border-left-color: var(--pacifica); } .bal.bn { border-left-color: var(--binance); }
+  .bal h3 { margin: 0 0 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 700; color: var(--head); }
+  .bal h3 .who { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; }
+  .bal b { display: block; color: var(--head); font-size: 24px; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; }
+  .bal span { color: var(--muted); font-size: 12px; font-weight: 600; }
+  .net { font-size: 10px; font-weight: 800; letter-spacing: .08em; padding: 2px 7px; border-radius: 6px; }
+  .net.real { color: var(--mainnet); background: rgba(255, 107, 107, .14); }
+  .net.test { color: var(--testnet); background: none; border: 1px dashed rgba(180, 172, 240, .6); padding: 1px 6px; }
+
+  /* Positions table scrolls inside its own box; the page never scrolls sideways. */
+  .scroll { overflow-x: auto; margin: 0 -22px; padding: 0 22px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: right; padding: 10px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; color: var(--head); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  th:first-child, td:first-child { text-align: left; padding-left: 0; }
+  td:last-child, th:last-child { padding-right: 0; }
+  td.close-cell { padding-left: 18px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.up, .up { color: var(--up); } td.down, .down { color: var(--down); } .muted { color: var(--muted); }
+  .coin { font-weight: 800; }
+  /* Venue chip: brand outline + logo, network as a separate tag. */
+  .venue { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 2px 9px 2px 3px; border-radius: 999px; border: 1px solid; background: none; }
+  .venue.pac { border-color: rgba(97, 215, 239, .45); color: var(--pacifica); }
+  .venue.bn { border-color: rgba(240, 185, 11, .45); color: var(--binance); }
+  .venue i { font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+  .venue i.real { color: var(--mainnet); } .venue i.test { color: var(--testnet); }
+  tr.fail td { text-align: left; white-space: normal; color: var(--muted); font-size: 13px; padding-top: 12px; padding-bottom: 12px; }
+  tr.fail b { color: var(--down); }
+  .note { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+  .note b { color: var(--warn); }
+
+  input, select { width: 100%; min-width: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--deep); color: var(--head);
+    font: 600 14px Montserrat, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  input::placeholder { color: var(--dim); }
+  input:hover, select:hover { border-color: var(--dim); }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(106, 86, 228, .3); }
+  select { appearance: none; padding-right: 32px; cursor: pointer;
+    background: var(--deep) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a7a7ca' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center; }
+  .secret { -webkit-text-security: disc; font-family: var(--mono); }
+  button { font: 700 14px Montserrat, system-ui, sans-serif; padding: 10px 22px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer;
+    transition: transform 160ms var(--ease-out), background-color 150ms ease, border-color 150ms ease, opacity 150ms ease; }
+  button:hover { background: var(--accent-hi); border-color: var(--accent-hi); }
+  button:active { transform: scale(.97); }
+  button.ghost { background: none; color: var(--text); border-color: var(--dim); }
+  button.ghost:hover { background: rgba(106, 86, 228, .15); border-color: var(--accent-hi); }
+  button.small { padding: 5px 14px; font-size: 12px; }
+  button.danger { background: var(--down); border-color: var(--down); color: #1a0d10; }
+  button:disabled { opacity: .38; cursor: not-allowed; transform: none; }
+
+  /* Ticket: the frame takes the selected venue's network colour. */
+  .ticket { --tone: var(--off); background: var(--panel); border-radius: 16px; border: 1px solid var(--tone); overflow: hidden; margin-bottom: 20px; }
+  .ticket.real { --tone: var(--mainnet); box-shadow: 0 0 0 4px rgba(255, 107, 107, .08), 0 18px 40px -20px rgba(255, 107, 107, .35); }
+  .ticket.test { --tone: rgba(180, 172, 240, .55); }
+  .band { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 7px 12px; background: var(--mainnet); color: #1a0d10;
+    font-size: 12px; font-weight: 800; letter-spacing: .14em; }
+  .band::before, .band::after { content: ''; width: 18px; height: 2px; background: currentColor; opacity: .5; }
+  .band.test { background: rgba(180, 172, 240, .12); color: var(--testnet); letter-spacing: .1em; }
+  .band.off { background: var(--deep); color: var(--dim); letter-spacing: .1em; }
+  .band.test::before, .band.test::after, .band.off::before, .band.off::after { display: none; }
+  .t-body { padding: 18px 20px 20px; display: grid; gap: 14px; }
+  .t-body h2 { margin: 0; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 4px; background: var(--deep); border-radius: 999px; border: 0; margin: 0; }
+  .seg legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .seg label { position: relative; display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; border-radius: 999px; cursor: pointer;
+    font-size: 13px; font-weight: 700; color: var(--muted); transition: background-color 150ms ease, color 150ms ease; }
+  .seg input { position: absolute; opacity: 0; inset: 0; width: auto; padding: 0; border: 0; cursor: pointer; }
+  .seg label:has(input:checked) { background: var(--panel); color: var(--head); box-shadow: inset 0 0 0 1px var(--line); }
+  .seg label:has(input:focus-visible) { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+  .seg label .logo { width: 18px; height: 18px; border-radius: 5px; }
+  .seg label.pac:has(input:checked) { color: var(--pacifica); box-shadow: inset 0 0 0 1.5px var(--pacifica); }
+  .seg label.bn:has(input:checked) { color: var(--binance); box-shadow: inset 0 0 0 1.5px var(--binance); }
+  .field { display: grid; gap: 6px; }
+  .field > span { color: var(--muted); font-size: 12px; font-weight: 600; padding-left: 14px; }
+  .pair { display: grid; grid-template-columns: 110px 1fr; gap: 10px; }
+  /* Size field with a unit switch (coin | $). */
+  .size { position: relative; }
+  .size input { padding-right: 104px; }
+  .unit { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--panel); }
+  .unit button { min-height: 0; padding: 4px 10px; font-size: 12px; font-weight: 800; background: none; border: 0; color: var(--muted); border-radius: 999px; }
+  .unit button:hover { background: rgba(106, 86, 228, .15); color: var(--head); }
+  .unit button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .hint { margin: -4px 0 0; padding-left: 14px; color: var(--muted); font-size: 12px; font-weight: 600; }
+  .hint.bad { color: var(--warn); }
+  .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sides button { padding: 12px 10px; font-weight: 800; color: #0d1a12; display: grid; justify-items: center; gap: 1px; line-height: 1.2; }
+  .sides button small { font-size: 12px; font-weight: 700; opacity: .8; }
+  .sides button small:empty { display: none; }
+  .sides .long { background: var(--up); border-color: var(--up); }
+  .sides .long:hover { background: #5be59a; border-color: #5be59a; }
+  .sides .short { background: var(--down); border-color: var(--down); color: #1a0d10; }
+  .sides .short:hover { background: #ff8787; border-color: #ff8787; }
+  .status { color: var(--text); font-family: var(--mono); font-size: 12px; background: var(--deep); padding: 10px 14px; border-radius: 12px; border-left: 3px solid var(--tone, var(--off)); margin: 0; }
+
+  /* Accounts: two cards side by side, brand stripe on top. */
+  .acc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  .acc-card { background: var(--panel); border-radius: 16px; padding: 20px 22px; display: grid; gap: 14px; border-top: 3px solid var(--off); min-width: 0; }
+  .acc-card.pac { border-top-color: var(--pacifica); background: linear-gradient(180deg, var(--pacifica-bg), var(--panel) 140px); }
+  .acc-card.bn { border-top-color: var(--binance); }
+  .acc-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .acc-card .who { display: flex; align-items: center; gap: 12px; }
+  .acc-card h3 { margin: 0; font-size: 16px; font-weight: 800; }
+  .acc-card h3 + span { display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 2px; }
+  .acc-card header .badge { padding: 5px 11px; }
+  .acc-card .status.ok { border-left-color: var(--up); }
+  .warn-line { margin: 0; color: var(--muted); font-size: 13px; }
+  .warn-line b { color: var(--head); }
+  .warn-line b::before { content: '! '; color: var(--down); }
+  details { font-size: 13px; color: var(--muted); }
+  details summary { cursor: pointer; color: var(--accent-hi); font-weight: 600; list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 28px; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: '▸'; font-size: 11px; transition: transform 150ms ease; }
+  details[open] summary::before { transform: rotate(90deg); }
+  details ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+  .fields { display: grid; gap: 8px; }
+  .acc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* Funding comparison */
+  #funding .sub { font-size: 14px; color: var(--muted); }
+  #funding .scroll { margin: 0; padding: 0; }
+  #fd-table td.coin { font-weight: 800; }
+  #fd-table td.pos-rate { color: #ff9a9a; } #fd-table td.neg-rate { color: var(--up); }
+  #fd-table td.apr { font-weight: 800; }
+  #sc-q { max-width: 320px; margin-bottom: 8px; }
+  #sc-table th button { all: unset; cursor: pointer; } #sc-table th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #sc-table th[aria-sort] { color: var(--head); }
+  #sc-table td.coin button { all: unset; cursor: pointer; font-weight: 800; } #sc-table td.coin button:hover { color: var(--accent); }
+  #sc-table td.up { color: var(--up); } #sc-table td.down { color: var(--down); }
+  #fd-err { color: var(--down); }
+
+  /* Market overview: read-only Pacifica mainnet, visually subordinate. */
+  #overview { background: none; border: 1px solid var(--line); }
+  #overview h2 { color: var(--muted); }
+  #overview .panel { overflow-x: auto; }
+  #nexus { display: block; width: min(600px, 100%); height: calc(100dvh - 150px); min-height: 560px; margin: 0 auto 20px; border: 1px solid var(--line); border-radius: 16px; background: #0a0e14; }
+  .sub { color: var(--text); font-size: 15px; margin: 0 0 18px; max-width: 640px; }
+  #ticker { border-radius: 999px; background: rgba(36, 36, 51, .5); overflow: hidden; padding: 8px 0; min-height: 50px;
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+  .track { display: flex; width: max-content; animation: marquee 60s linear infinite; }
+  .track > div { display: flex; gap: 8px; padding-right: 8px; }
+  .tick { display: flex; gap: 10px; align-items: baseline; padding: 6px 16px; border-radius: 999px; background: var(--panel); white-space: nowrap; font-size: 13px; font-weight: 700; }
+  .tick span { color: var(--muted); font-weight: 600; } .tick b { color: var(--head); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  #ticker:hover .track { animation-play-state: paused; }
+  .stats { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 24px; margin: 28px 0 28px; }
+  .stat b { display: block; color: var(--head); font-size: clamp(36px, 5.4vw, 68px); font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+  .stat:first-child b { background: linear-gradient(90deg, #fff 40%, #c9c0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat span { display: block; color: var(--muted); font-size: 14px; font-weight: 600; margin-top: 10px; }
+  #f { display: flex; gap: 8px; flex-wrap: wrap; }
+  #f input { flex: 1 1 320px; width: auto; font: 13px var(--mono); }
+  tr.click { cursor: pointer; transition: background-color 150ms ease; } tr.click:hover { background: rgba(106, 86, 228, .12); }
   .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-  .group h3 { font-size: 13px; color: var(--muted); font-weight: 500; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; }
-  .chip { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .group { background: var(--deep); border-radius: 12px; padding: 14px 16px; }
+  .group h3 { font-size: 12px; color: var(--muted); font-weight: 700; margin: 0 0 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .chip { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; color: var(--head); }
   .chip:last-child { border-bottom: 0; }
-  .badge { font-size: 12px; vertical-align: middle; background: #f59e0b; color: #000; border-radius: 6px; padding: 2px 8px; margin-left: 8px; }
-  #order input, select { flex: 0 1 140px; }
-  select { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: inherit; }
-  button.ghost { background: transparent; border: 1px solid var(--accent); color: var(--text); }
-  a { color: var(--accent); }
-  button.small { padding: 4px 10px; font-size: 13px; }
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  footer .wrap { padding-top: 22px; padding-bottom: 28px; }
+
+  .top.framed { grid-template-columns: minmax(0, 1fr); grid-template-areas: "port"; }
+  @media (max-width: 999px) {
+    .top { grid-template-columns: minmax(0, 1fr); grid-template-areas: "port" "ticket"; gap: 0; }
+    .ticket-col { position: static; }
+    .stats { grid-template-columns: 1fr 1fr; } .stat:first-child { grid-column: 1 / -1; }
+  }
+  /* Narrow screens: the same table markup renders as one card per position. */
+  @media (max-width: 860px) {
+    .acc-grid { grid-template-columns: 1fr; }
+    #pos-wrap { overflow: visible; margin: 0; padding: 0; }
+    #positions-all, #positions-all tbody, #positions-all td { display: block; }
+    #positions-all thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    #positions-all tr { display: flex; flex-wrap: wrap; align-items: center; }
+    #positions-all td { border: 0; padding: 0; text-align: left; }
+    tr.pos { gap: 12px 8px; background: var(--deep); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    tr.pos td:nth-child(2) { font-size: 16px; }
+    tr.pos td.side { margin-left: auto; font-weight: 700; }
+    tr.pos td[data-label] { flex: 1 1 30%; font-size: 14px; }
+    tr.pos td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; font-weight: 600; }
+    tr.pos td.close-cell { flex: 1 1 100%; }
+    tr.pos td.close-cell:empty { display: none; }
+    #positions-all td.close-cell { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding-left: 0; }
+    #positions-all td.close-cell button { min-height: 40px; padding: 8px 18px; white-space: normal; }
+    #positions-all tr.fail td { padding: 4px 0 0; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px; }
+    body > header .wrap { padding-top: 16px; padding-bottom: 14px; gap: 12px; }
+    .brand { flex: 1 1 calc(100% - 150px); min-width: 0; }
+    .head-tools { display: contents; }
+    #lang { order: 1; align-self: flex-start; }
+    .conn { order: 2; margin-left: auto; }
+    #lang button { min-height: 38px; padding: 4px 9px; }
+    #tabs .wrap { gap: 0; }
+    #tabs button { flex: 1 1 0; justify-content: center; padding: 0 6px; font-size: 14px; }
+    .panel { padding: 16px; }
+    .scroll { margin: 0 -16px; padding: 0 16px; }
+    #balances { grid-template-columns: 1fr; }
+    .acc-card { padding: 16px; }
+    .empty-card { padding: 40px 16px; }
+    .empty-card.has-theon { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .empty-card .theon { grid-row: auto; width: 96px; }
+    .empty-card.has-theon .venues-mini { justify-content: center; }
+    button, input, select, .seg label { min-height: 44px; }
+    button.small { min-height: 44px; padding: 8px 16px; }
+    .unit button { min-height: 0; padding: 6px 10px; }
+    .sides button { min-height: 52px; }
+    #fd-table, #fd-table tbody, #fd-table td { display: block; }
+    #fd-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    #fd-table tr { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: center; background: var(--deep); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+    #fd-table td { border: 0; padding: 0; text-align: left; font-size: 14px; }
+    #fd-table td.coin { grid-row: 1; grid-column: 1 / 3; font-size: 16px; }
+    #fd-table td.long { grid-row: 1; grid-column: 3 / 5; justify-self: end; }
+    #fd-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; font-weight: 600; }
+    #sc-q { max-width: none; }
+    #sc-table, #sc-table tbody, #sc-table td { display: block; }
+    #sc-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    #sc-table tr { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--deep); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+    #sc-table td { border: 0; padding: 0; text-align: left; font-size: 14px; }
+    #sc-table td.coin { grid-column: 1 / 4; font-size: 16px; }
+    #sc-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; font-weight: 600; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<main>
-  <h1>Perps Lens<span id="net" class="badge" hidden>TESTNET</span></h1>
-  <p class="sub" id="sub">Ончейн-перпы на Solana рядом с твоей CEX. Живые данные Pacifica, только просмотр, без ключей. <a href="?net=testnet">Попробовать торговлю на testnet →</a></p>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo-pacifica" viewBox="0 0 2000 2000"><path d="M2000 0H0V2000H2000V0Z" fill="#0E1724"/><path d="M1000.32 860.22C1017.75 933.726 1065.22 980.106 1140.55 1003.11C1141.93 1003.54 1143.14 1004.4 1144 1005.57C1144.86 1006.73 1145.32 1008.14 1145.32 1009.59C1145.32 1011.04 1144.86 1012.45 1144 1013.62C1143.14 1014.78 1141.93 1015.64 1140.55 1016.07C1106.66 1024.11 1075.64 1041.33 1050.88 1065.83C1026.12 1090.33 1008.59 1121.17 1000.19 1154.97C999.801 1156.4 998.949 1157.67 997.768 1158.57C996.586 1159.47 995.141 1159.96 993.655 1159.96C992.17 1159.96 990.726 1159.47 989.544 1158.57C988.363 1157.67 987.51 1156.4 987.117 1154.97C978.638 1121.95 961.594 1091.75 937.708 1067.42C913.331 1042.57 882.711 1024.75 849.066 1015.83C847.682 1015.4 846.471 1014.54 845.611 1013.38C844.751 1012.21 844.288 1010.8 844.288 1009.35C844.288 1007.9 844.751 1006.49 845.611 1005.33C846.471 1004.16 847.682 1003.3 849.066 1002.87C923.541 981.075 969.314 933.726 987.358 860.22C987.786 858.836 988.646 857.625 989.812 856.766C990.978 855.906 992.388 855.442 993.837 855.442C995.286 855.442 996.696 855.906 997.862 856.766C999.028 857.625 999.888 858.836 1000.32 860.22Z" fill="#61D7EF"/><path d="M1413.38 1137.77C1413.38 1280.28 1358.15 1417.24 1259.29 1519.88C1160.42 1622.52 1025.62 1682.84 883.214 1688.16C880.577 1688.28 877.944 1687.86 875.474 1686.93C873.003 1686 870.746 1684.59 868.835 1682.77C866.924 1680.95 865.4 1678.76 864.354 1676.34C863.309 1673.91 862.763 1671.3 862.749 1668.67V1413.15C926.283 1413.14 987.86 1391.17 1037.05 1350.96C1086.24 1310.75 1120.02 1254.77 1132.67 1192.51C1135.53 1177.27 1143.59 1163.5 1155.47 1153.54C1167.35 1143.58 1182.32 1138.05 1197.82 1137.9L1413.38 1137.77Z" fill="#61D7EF"/><path d="M862.387 1197.48V1413.15C719.88 1413.15 582.918 1357.92 480.282 1259.06C377.646 1160.19 317.328 1025.39 312.001 882.986C311.887 880.349 312.305 877.717 313.232 875.246C314.159 872.775 315.576 870.517 317.396 868.606C319.217 866.696 321.402 865.172 323.825 864.126C326.248 863.08 328.858 862.534 331.497 862.521H587.012C587.113 926.051 609.188 987.591 649.491 1036.7C689.795 1085.81 745.846 1119.47 808.136 1131.96C823.357 1134.93 837.08 1143.08 846.971 1155.02C856.862 1166.97 862.31 1181.97 862.387 1197.48Z" fill="#61D7EF"/><path d="M803.049 862.401H587.376C587.372 719.873 642.62 582.894 741.51 480.255C840.401 377.615 975.231 317.31 1117.66 312.013C1120.29 311.916 1122.92 312.347 1125.38 313.28C1127.84 314.213 1130.1 315.63 1132 317.447C1133.91 319.264 1135.44 321.445 1136.49 323.86C1137.54 326.275 1138.1 328.877 1138.13 331.511V587.026C1074.57 587.021 1012.97 609.001 963.769 649.238C914.571 689.475 880.805 745.491 868.2 807.786C865.363 823.034 857.312 836.821 845.426 846.784C833.54 856.748 818.559 862.269 803.049 862.401Z" fill="#61D7EF"/><path d="M1138.01 802.821V587.026C1280.52 586.99 1417.5 642.213 1520.15 741.084C1622.79 839.955 1683.1 974.772 1688.39 1117.19C1688.53 1119.82 1688.12 1122.45 1687.21 1124.92C1686.3 1127.39 1684.89 1129.65 1683.08 1131.56C1681.27 1133.48 1679.09 1135 1676.67 1136.05C1674.26 1137.1 1671.65 1137.64 1669.02 1137.65H1413.38C1413.38 1074.11 1391.4 1012.53 1351.16 963.35C1310.92 914.172 1254.91 880.43 1192.62 867.85C1177.41 864.996 1163.65 856.956 1153.69 845.1C1143.73 833.243 1138.19 818.303 1138.01 802.821Z" fill="#61D7EF"/></symbol>
+  <symbol id="logo-binance" viewBox="-24 -24 174.611 174.611"><rect x="-24" y="-24" width="174.611" height="174.611" fill="#1E2026"/><polygon fill="#F3BA2F" points="38.171,53.203 62.759,28.616 87.36,53.216 101.667,38.909 62.759,0 23.864,38.896 "/> <rect x="3.644" y="53.188" transform="matrix(0.7071 0.7071 -0.7071 0.7071 48.7933 8.8106)" fill="#F3BA2F" width="20.233" height="20.234"/> <polygon fill="#F3BA2F" points="38.171,73.408 62.759,97.995 87.359,73.396 101.674,87.695 101.667,87.703 62.759,126.611 23.863,87.716 23.843,87.696 "/> <rect x="101.64" y="53.189" transform="matrix(-0.7071 0.7071 -0.7071 -0.7071 235.5457 29.0503)" fill="#F3BA2F" width="20.234" height="20.233"/> <polygon fill="#F3BA2F" points="77.271,63.298 77.277,63.298 62.759,48.78 52.03,59.509 52.029,59.509 50.797,60.742 48.254,63.285 48.254,63.285 48.234,63.305 48.254,63.326 62.759,77.831 77.277,63.313 77.284,63.305 "/></symbol>
+  <symbol id="logo-pantheon" viewBox="1318.8 357 238.4 238.4"><path fill="#D1CFE9" fill-rule="evenodd" d="M1423.88 432.16L1378.70 386.98C1370.45 378.73 1357.07 378.73 1348.82 386.98C1340.57 395.23 1340.57 408.61 1348.82 416.86L1363.98 432.02C1380.48 448.30 1406.96 448.46 1423.65 432.38L1423.88 432.16M1357.00 513.31L1364.00 520.31L1348.82 535.50C1340.57 543.75 1340.57 557.13 1348.82 565.38C1357.07 573.63 1370.45 573.63 1378.70 565.38L1423.96 520.12L1423.67 519.82C1407.09 503.46 1380.39 503.66 1364.06 520.26L1357.00 513.31M1527.21 386.98C1518.97 378.73 1505.58 378.73 1497.33 386.98L1444.95 439.36L1437.39 446.64C1412.95 470.19 1374.18 469.95 1350.04 446.10L1357.00 439.05L1349.99 446.05L1334.81 430.87C1318.82 414.88 1318.82 388.96 1334.81 372.97C1350.79 356.98 1376.71 356.98 1392.70 372.97L1438.02 418.28L1483.33 372.97C1499.32 356.98 1525.24 356.98 1541.22 372.97C1557.21 388.96 1557.21 414.88 1541.22 430.87L1495.91 476.18L1541.22 521.49C1557.21 537.48 1557.21 563.40 1541.22 579.39C1525.24 595.37 1499.32 595.37 1483.33 579.39L1438.02 534.07L1392.70 579.39C1376.71 595.37 1350.79 595.37 1334.81 579.39C1318.82 563.40 1318.82 537.48 1334.81 521.49L1349.97 506.33C1373.98 481.96 1413.21 481.68 1437.57 505.72L1445.02 513.06L1497.33 565.38C1505.58 573.63 1518.97 573.63 1527.21 565.38C1535.46 557.13 1535.46 543.75 1527.21 535.50L1467.90 476.18L1527.21 416.86C1535.46 408.61 1535.46 395.23 1527.21 386.98"/></symbol>
+</svg>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <svg aria-hidden="true"><use href="#logo-pantheon"/></svg>
+      <div><h1>PantheonX</h1><p><span class="by">Perps Lens</span> · <span data-i18n="tagline"></span></p></div>
+    </div>
+    <div class="head-tools">
+      <button type="button" class="conn" id="conn" data-go="accounts"></button>
+      <div id="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button><button type="button" data-lang="uk">UK</button>
+      </div>
+    </div>
+  </div>
+</header>
 
-  <div class="stats">
-    <div class="stat"><b id="s-vol">…</b><span>объём Pacifica за 24ч</span></div>
-    <div class="stat"><b id="s-markets">…</b><span>рынков</span></div>
-    <div class="stat"><b id="s-tradfi">…</b><span>из них не крипта: акции, сырьё, валюты</span></div>
+<nav id="tabs" data-i18n-aria="tabs_aria">
+  <div class="wrap" role="tablist">
+    <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
+    <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span data-i18n="tab_market"></span></button>
+    <button type="button" role="tab" data-tab="screener" aria-controls="tab-screener"><span data-i18n="tab_screener"></span></button>
+    <button type="button" role="tab" data-tab="order-flow" aria-controls="tab-order-flow" title="Nexus Flow by PantheonX">Order Flow</button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div id="tab-trade" role="tabpanel" hidden>
+    <section class="panel empty-card has-theon" id="trade-empty" hidden>
+      <img class="theon" src="img/theon-cyan.webp" width="132" height="240" alt="">
+      <h2 data-i18n="empty_h"></h2>
+      <p data-i18n="empty_p"></p>
+      <div class="venues-mini"><span class="badge off"><svg class="logo" aria-hidden="true"><use href="#logo-pacifica"/></svg>Pacifica</span><span class="badge off"><svg class="logo" aria-hidden="true"><use href="#logo-binance"/></svg>Binance</span></div>
+      <button type="button" data-go="accounts" data-i18n="empty_btn"></button>
+    </section>
+
+    <div class="top" id="top" hidden>
+      <section class="panel" id="portfolio">
+        <div class="panel-head"><h2 data-i18n="portfolio"></h2><span id="updated"></span></div>
+        <div id="framed-note" class="note" data-i18n="framed" hidden></div>
+        <div id="balances"></div>
+        <div class="scroll" id="pos-wrap" hidden>
+          <table id="positions-all" role="table">
+            <thead role="rowgroup"><tr role="row"><th role="columnheader" data-i18n="c_venue"></th><th role="columnheader" data-i18n="c_coin"></th><th role="columnheader" data-i18n="c_side"></th><th role="columnheader" data-i18n="c_size"></th><th role="columnheader">≈$</th><th role="columnheader" data-i18n="c_entry"></th><th role="columnheader" data-i18n="c_mark"></th><th role="columnheader">PnL</th><th role="columnheader"><span class="sr" data-i18n="close"></span></th></tr></thead>
+            <tbody id="pos-rows" role="rowgroup"></tbody>
+          </table>
+        </div>
+        <p class="note" id="pos-note"></p>
+        <p class="note" data-i18n="pnl_note"></p>
+      </section>
+
+      <div class="ticket-col" id="ticket-col">
+        <section class="ticket off" id="ticket">
+          <div class="band off" id="t-band"></div>
+          <div class="t-body">
+            <h2 data-i18n="order"></h2>
+            <fieldset class="seg" id="t-venue">
+              <legend data-i18n="c_venue"></legend>
+              <label class="pac"><input type="radio" name="t-venue" value="pacifica"><svg class="logo" aria-hidden="true"><use href="#logo-pacifica"/></svg>Pacifica</label>
+              <label class="bn"><input type="radio" name="t-venue" value="binance" checked><svg class="logo" aria-hidden="true"><use href="#logo-binance"/></svg>Binance</label>
+            </fieldset>
+            <div class="pair">
+              <label class="field"><span data-i18n="c_coin"></span><select id="t-coin"></select></label>
+              <div class="field"><span data-i18n="size"></span>
+                <span class="size"><input id="t-size" inputmode="decimal" autocomplete="off" data-i18n-aria="size">
+                  <span class="unit" id="t-unit" role="group" data-i18n-aria="unit_aria"><button type="button" data-unit="coin" id="u-coin"></button><button type="button" data-unit="usd">$</button></span></span></div>
+            </div>
+            <p class="hint" id="t-hint"></p>
+            <div class="sides">
+              <button type="button" class="long" id="t-long" disabled>Buy / Long<small class="amt"></small></button>
+              <button type="button" class="short" id="t-short" disabled>Sell / Short<small class="amt"></small></button>
+            </div>
+            <p class="status" id="t-status"></p>
+          </div>
+        </section>
+      </div>
+    </div>
   </div>
 
-  <section class="panel" id="trade" hidden>
-    <h2>Торговля</h2>
-    <form id="order">
-      <button type="button" id="connect" class="ghost">Подключить Phantom</button>
-      <select id="o-symbol"></select>
-      <select id="o-side"><option value="bid">Long</option><option value="ask">Short</option></select>
-      <input id="o-size" placeholder="Размер, монет" inputmode="decimal" autocomplete="off">
-      <input id="o-slip" value="0.5" title="Проскальзывание, %" inputmode="decimal" autocomplete="off">
-      <button>Отправить</button>
-    </form>
-    <div id="o-status" class="note">Подключи Phantom, чтобы торговать. Каждый ордер подписывается в кошельке.</div>
-    <p class="note"><b>Подключай отдельный пустой кошелёк.</b> Подпись Pacifica не указывает сеть и 30 секунд действительна и на mainnet, поэтому не подписывай здесь кошельком с реальным депозитом на Pacifica. Тестовые средства: devnet SOL и USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).</p>
-  </section>
+  <dialog id="conn-dlg" aria-labelledby="conn-h">
+    <div class="dlg-head">
+      <div><h2 id="conn-h" data-i18n="tab_accounts"></h2><p data-i18n="conn_sub"></p></div>
+      <button type="button" class="ghost dlg-x" id="conn-x" data-i18n-aria="close_aria">×</button>
+    </div>
+    <section id="accounts">
+      <div class="acc-grid">
+        <article class="acc-card pac">
+          <header>
+            <div class="who"><svg class="logo lg" aria-hidden="true"><use href="#logo-pacifica"/></svg><div><h3 class="vn pac">Pacifica</h3><span>Phantom · testnet</span></div></div>
+            <span class="badge off" id="acc-badge-pacifica"></span>
+          </header>
+          <p class="status" id="ph-status"></p>
+          <div class="acc-actions">
+            <button type="button" class="ghost" id="ph-connect" data-i18n="ph_connect"></button>
+            <button type="button" class="ghost" id="ph-disconnect" data-i18n="disconnect" hidden></button>
+          </div>
+          <p class="warn-line"><b data-i18n="ph_warn"></b></p>
+          <details>
+            <summary data-i18n="ph_more"></summary>
+            <ul><li data-i18n="ph_li1"></li><li data-i18n-html="ph_li2"></li></ul>
+          </details>
+        </article>
 
-  <section class="panel">
-    <h2>Позиции кошелька</h2>
-    <form id="f">
-      <input id="wallet" placeholder="Solana-адрес кошелька" autocomplete="off" spellcheck="false">
-      <button>Показать</button>
-    </form>
-    <div id="positions" class="note">Введи адрес или кликни трейдера в таблице ниже.</div>
-  </section>
+        <article class="acc-card bn">
+          <header>
+            <div class="who"><svg class="logo lg" aria-hidden="true"><use href="#logo-binance"/></svg><div><h3 class="vn bn">Binance</h3><span data-i18n="bn_sub"></span></div></div>
+            <span class="badge off" id="acc-badge-binance"></span>
+          </header>
+          <p class="status" id="bn-status"></p>
+          <div class="fields" id="bn-fields">
+            <select id="bn-net" data-i18n-aria="bn_net_aria"><option value="demo">Demo Trading</option><option value="mainnet">Mainnet</option></select>
+            <input id="bn-key" placeholder="API Key" aria-label="API Key" autocomplete="off" spellcheck="false">
+            <input id="bn-secret" class="secret" type="text" placeholder="Secret Key" aria-label="Secret Key" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="acc-actions">
+            <button type="button" id="bn-connect" data-i18n="connect"></button>
+            <button type="button" class="ghost" id="bn-disconnect" data-i18n="disconnect" hidden></button>
+          </div>
+          <p class="warn-line theon-warn" id="bn-warn" hidden><img class="theon" src="img/theon-amber-head.webp" width="40" height="40" alt=""><b data-i18n="bn_main_warn"></b></p>
+          <p class="warn-line"><b data-i18n="bn_warn"></b></p>
+          <details>
+            <summary data-i18n="bn_more"></summary>
+            <ul><li data-i18n="bn_li1"></li><li data-i18n="bn_li2"></li><li data-i18n-html="bn_li3"></li></ul>
+          </details>
+        </article>
+      </div>
+    </section>
+  </dialog>
 
-  <section class="panel">
-    <h2>Топ трейдеров Pacifica</h2>
-    <div id="leaders" class="note">Загрузка…</div>
-  </section>
-
-  <section class="panel">
-    <h2>Не только крипта</h2>
-    <div id="tradfi" class="groups note">Загрузка…</div>
-  </section>
+  <div id="tab-market" role="tabpanel" hidden>
+    <section class="panel" id="funding">
+      <div class="panel-head"><h2 data-i18n="fd_h"></h2><span data-i18n="fd_unit"></span></div>
+      <p class="sub" data-i18n="fd_sub"></p>
+      <div class="scroll">
+        <table id="fd-table">
+          <thead><tr><th data-i18n="fd_mkt"></th><th>Pacifica</th><th>Binance</th><th data-i18n="fd_spread"></th><th>≈ APR</th><th data-i18n="fd_long"></th></tr></thead>
+          <tbody id="fd-rows"></tbody>
+        </table>
+      </div>
+      <p class="note" id="fd-state"></p>
+      <p class="note" id="fd-err" hidden></p>
+      <p class="note" data-i18n="fd_foot"></p>
+    </section>
+    <section class="panel" id="overview">
+      <div class="panel-head"><h2 data-i18n="ov_h"></h2><span data-i18n="ov_ro"></span></div>
+      <p class="sub" data-i18n="ov_sub"></p>
+      <div id="ticker" data-i18n-aria="ticker_aria"></div>
+      <div class="stats">
+        <div class="stat"><b id="s-vol">…</b><span data-i18n="st_vol"></span></div>
+        <div class="stat"><b id="s-markets">…</b><span data-i18n="st_markets"></span></div>
+        <div class="stat"><b id="s-tradfi">…</b><span data-i18n="st_tradfi"></span></div>
+      </div>
+      <section class="panel">
+        <h2 data-i18n="wp_h"></h2>
+        <form id="f">
+          <input id="wallet" data-i18n-ph="wp_ph" autocomplete="off" spellcheck="false">
+          <button data-i18n="wp_btn"></button>
+        </form>
+        <div id="positions" class="note"></div>
+      </section>
+      <section class="panel">
+        <h2 data-i18n="lb_h"></h2>
+        <div id="leaders" class="note"></div>
+      </section>
+      <section class="panel">
+        <h2 data-i18n="tf_h"></h2>
+        <div id="tradfi" class="groups note"></div>
+      </section>
+    </section>
+  </div>
+  <div id="tab-screener" role="tabpanel" hidden>
+    <section class="panel" id="screener">
+      <div class="panel-head"><h2 data-i18n="sc_h"></h2><span data-i18n="sc_unit"></span></div>
+      <p class="sub" data-i18n="sc_sub"></p>
+      <input id="sc-q" type="search" autocomplete="off" spellcheck="false" data-i18n-ph="sc_ph" data-i18n-aria="sc_ph">
+      <div class="scroll">
+        <table id="sc-table">
+          <thead><tr id="sc-head"></tr></thead>
+          <tbody id="sc-rows"></tbody>
+        </table>
+      </div>
+      <p class="note" id="sc-state"></p>
+      <p class="note" data-i18n="sc_foot"></p>
+    </section>
+  </div>
+  <div id="tab-order-flow" role="tabpanel" hidden>
+    <!-- PantheonX's order-flow tool, embedded as is: their code and server, not ours. -->
+    <iframe id="nexus" title="Nexus Flow" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+  </div>
 </main>
+<footer><div class="wrap" data-i18n="footer"></div></footer>
 <script type="module">
-import { signedBody } from "./pacifica-sign.js";
+import { BASES, binance, binanceVenue } from "./binance.js";
+import { PACIFICA, pacificaApi, pacificaVenue } from "./pacifica.js";
+import { checkOrder, MAINNET_CAP, STALE_MS, unknownOutcome, usdToQty } from "./ticket.js";
+import { fundingRows } from "./funding.js";
 
-const TEST_API = "https://test-api.pacifica.fi/api/v1";
-// Trading exists only on testnet: ?net=testnet switches the whole page, mainnet stays read-only.
-const TESTNET = new URLSearchParams(location.search).get("net") === "testnet";
-const API = TESTNET ? TEST_API : "https://api.pacifica.fi/api/v1";
-// Non-crypto markets on Pacifica, grouped for display.
+// ---- i18n: static dictionary (trusted). Elements: data-i18n -> textContent, data-i18n-html -> innerHTML (links only),
+// data-i18n-ph -> placeholder, data-i18n-aria -> aria-label. Dynamic text goes through t() at render time.
+const I18N = {
+  en: {
+    tagline: "Every side of the trade", net_real: "MAINNET — REAL MONEY", off: "not connected", tabs_aria: "Sections",
+    tab_trade: "Trade", tab_accounts: "Connections", conn_sub: "Each exchange connects on its own network", close_aria: "Close", tab_market: "Market", tab_screener: "Screener",
+    sc_h: "Screener: Binance USDT-M", sc_unit: "live · read-only", sc_sub: "Every Binance perp in one table: price, funding, open interest, CVD and liquidations. Sort by any column; tap a coin to put it in the order ticket.",
+    sc_ph: "Find a coin", sc_coin: "Coin", sc_price: "Price", sc_chg: "24h", sc_vol: "Volume 24h", sc_fund: "Funding", sc_liq: "Liq. 1h",
+    sc_state: "Showing {n} of {total} · updated {time}", sc_more: "Search to find the rest.", sc_none: "No coin matches.", sc_err: "Screener unavailable: {msg}",
+    sc_go: "Open {coin} in the order ticket", sc_foot: "Data: PantheonX screener service over Binance public streams · not advice. OI change in %, CVD and liquidations in $.",
+    empty_h: "Connect an exchange", empty_p: "Balances, positions and the order ticket show up here. Connect Phantom (Pacifica) or a Binance API key first.",
+    empty_btn: "Connect an exchange →",
+    portfolio: "Portfolio", updated: "updated {time}", available: "available {amt} · {unit}",
+    c_venue: "Venue", c_coin: "Coin", c_side: "Side", c_size: "Size", c_entry: "Entry", c_mark: "Mark", close: "Close",
+    pnl_note: "PnL at mark price, funding not included.",
+    framed: "This page is open inside a frame, so trading is off. Open perps-lens directly.",
+    loading: "Loading…", no_pos: "No open positions.", unavailable: "{venue} unavailable:",
+    close_confirm: "Confirm: close {size} {coin} on {venue}", cancel: "Cancel",
+    band_off: "NOT CONNECTED", band_real: "REAL MONEY", band_demo: "DEMO · VIEW ONLY", band_test: "TESTNET · TEST FUNDS",
+    order: "Order", size: "Size", unit_aria: "Size unit",
+    hint_coin: "≈ {usd} · min {min} · step {step}{cap}", hint_usd: "= {qty} {coin} · ≈ {usd} · min {min} · step {step}{cap}",
+    hint_cap: " · Mainnet cap ${cap}",
+    e_framed: "Trading is off inside a frame.", e_connect: "Connect {venue} with the Connect button at the top.",
+    e_demo: "Binance Demo doesn't accept orders from a browser (CORS), so it's view-only. Trade on Mainnet.",
+    e_nomarket: "No market data yet, try again shortly.", e_stale: "Prices are stale, refreshing…",
+    e_size: "Enter a size above zero.", e_mark: "No market price yet, try again shortly.",
+    e_lot: "Size is below the minimum lot of {min}.", e_notional: "The minimum order is ${min}. Increase the size.",
+    e_cap: "On Mainnet an order is capped at ${cap}: this one is ≈ ${usd}.", e_usd_low: "Below the minimum: {min} {coin} ≈ {usd}.",
+    t_idle: "Connect an exchange in the Accounts tab.", t_ready: "Market order. Mainnet asks for confirmation first.",
+    s_sign: "{venue}: confirm the order in Phantom…", s_sending: "{venue}: sending the order…",
+    s_done: "{venue}: {what} — {side} {qty} {coin}{at}{id}.",
+    st_filled: "filled", st_accepted: "accepted", st_other: "status {status}", st_close: "close", st_at: " at {px}",
+    s_unknown: "{venue}: outcome unknown ({msg}). Check your positions below.",
+    confirm: "{venue} · MAINNET — real money.\n{side} {qty} {coin} ≈ {usd}.\nSend the order?",
+    e_bad_response: "Unexpected reply from the exchange", e_wallet_cancel: "Cancelled in the wallet.",
+    connecting: "Connecting…", disconnected: "Disconnected.",
+    ph_idle: "Connect Phantom to trade. Every order is signed in your wallet.",
+    ph_on: "Connected · {addr} · orders are signed in Phantom", bn_on: "Connected · {net}",
+    ph_missing: "Phantom not found: install the Phantom extension (phantom.com) and reload. The page doesn't work as a local file, only over http(s).",
+    ph_rejected: "Connection cancelled.", ph_switched: "The Phantom account changed. Connect Phantom again.",
+    ph_connect: "Connect Phantom", disconnect: "Disconnect", connect: "Connect",
+    ph_warn: "Use a separate, empty wallet only.", ph_more: "Why, and where to get test funds",
+    ph_li1: "Pacifica's signature doesn't name the network and stays valid on mainnet for 30 seconds, so never sign here with a wallet that holds a real Pacifica deposit.",
+    ph_li2: 'Test funds: devnet SOL and USDP at <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).',
+    bn_sub: "API key · Futures", bn_net_aria: "Binance network",
+    bn_idle: "Paste a key to see your balance and trade.", bn_need: "Paste both the API Key and the Secret Key.",
+    bn_warn: "Futures permission only, no Withdraw.", bn_main_warn: "Mainnet: orders execute with real money.",
+    bn_more: "More about the key",
+    bn_li1: "The key lives only in this tab's memory and is gone when you close it.",
+    bn_li2: "On Mainnet, a key without an IP restriction can't trade while Default Security Controls are on.",
+    bn_li3: 'Demo key: <a href="https://demo.binance.com" target="_blank" rel="noopener">demo.binance.com</a> → API Management. Demo shows balance and positions, but the Demo server rejects orders sent from a browser.',
+    "bn_h-2014": "Invalid API key (or a key from the other network: Demo and Mainnet keys are different).",
+    "bn_h-2015_demo": "Key rejected: a Demo key is created at demo.binance.com (a Mainnet key at binance.com), it needs Futures permission, and if it has an IP list your IP must be on it.",
+    "bn_h-2015_main": "Key rejected: the key needs Futures permission. On a real account Binance's Default Security Controls block trading for keys without an IP restriction: restrict the key to your IP or turn the control off.",
+    "bn_h-1022": "Invalid Secret Key.", "bn_h-1021": "Your computer's clock is out of sync with the exchange. Reconnect.",
+    "bn_h-2019": "Insufficient margin: not enough USDT in the USDⓈ-M Futures account. Mainnet: move USDT via Wallet → Transfer → USDⓈ-M Futures. Demo: the account appears after you first open the futures section on demo.binance.com.",
+    "bn_h-4061": "Hedge Mode is on for this account. Switch to One-way in the futures settings.",
+    bn_h451: "Binance isn't available in your region.",
+    fd_h: "Funding: Pacifica vs Binance", fd_unit: "% per 8h · read-only",
+    fd_sub: "Funding is the periodic payment between longs and shorts. Long where it's cheaper, short where it's higher: the position is price-neutral and earns the spread.",
+    fd_mkt: "Market", fd_spread: "Spread", fd_long: "Cheaper long on", fd_same: "same",
+    fd_updated: "Updated {time}. Top 10 Pacifica markets by 24h volume that Binance also lists.",
+    fd_err: "Couldn't refresh funding: {msg}. Showing the last data.",
+    fd_foot: "Pacifica mainnet and Binance public data · refreshes every minute while this tab is open · not advice. Positive rate = longs pay.",
+    ov_h: "Pacifica market overview", ov_ro: "mainnet · read-only",
+    ov_sub: "On-chain perps on Solana next to your CEX. Live Pacifica data, read-only, no keys.", ticker_aria: "Pacifica prices",
+    st_vol: "Pacifica 24h volume", st_markets: "markets", st_tradfi: "of them non-crypto: stocks, commodities, FX",
+    wp_h: "Wallet positions", wp_ph: "Solana wallet address", wp_btn: "Show", wp_note: "Enter an address or click a trader in the table below.",
+    wp_mkt: "Market", wp_vol: "Notional", wp_total: "Total unrealised PnL", wp_pnl_note: "PnL at mark price, accrued funding not included.",
+    wp_fail: "Couldn't load: {msg}", err: "Error: {msg}",
+    lb_h: "Top Pacifica traders", lb_trader: "Trader", lb_30: "30d PnL", lb_all: "All-time PnL", lb_vol: "30d volume", lb_eq: "Equity",
+    lb_note: "Click a trader to see their positions. 🔒 means the trader hides their positions.",
+    tf_h: "Not just crypto", tf_stocks: "Stocks", tf_comm: "Commodities", tf_fx: "FX & indices",
+    footer: "Your exchange keys stay in this tab and go only to the exchange",
+  },
+  ru: {
+    tagline: "Сделка со всех сторон", net_real: "MAINNET — РЕАЛЬНЫЕ ДЕНЬГИ", off: "не подключена", tabs_aria: "Разделы",
+    tab_trade: "Торговля", tab_accounts: "Подключения", conn_sub: "Каждая биржа подключается в своей сети", close_aria: "Закрыть", tab_market: "Рынок", tab_screener: "Скринер",
+    sc_h: "Скринер: Binance USDT-M", sc_unit: "онлайн · только просмотр", sc_sub: "Все фьючерсы Binance в одной таблице: цена, funding, open interest, CVD и ликвидации. Сортируй по любой колонке; нажми на монету, чтобы перенести её в тикет.",
+    sc_ph: "Найти монету", sc_coin: "Монета", sc_price: "Цена", sc_chg: "24ч", sc_vol: "Объём 24ч", sc_fund: "Funding", sc_liq: "Ликв. 1ч",
+    sc_state: "Показано {n} из {total} · обновлено {time}", sc_more: "Остальные — через поиск.", sc_none: "Нет такой монеты.", sc_err: "Скринер недоступен: {msg}",
+    sc_go: "Открыть {coin} в тикете", sc_foot: "Данные: сервис скринера PantheonX поверх публичных потоков Binance · не совет. Изменение OI в %, CVD и ликвидации в $.",
+    empty_h: "Подключи биржу", empty_p: "Здесь будут балансы, позиции и ордер. Сначала подключи Phantom (Pacifica) или API-ключ Binance.",
+    empty_btn: "Подключить биржу →",
+    portfolio: "Портфель", updated: "обновлено {time}", available: "доступно {amt} · {unit}",
+    c_venue: "Биржа", c_coin: "Монета", c_side: "Сторона", c_size: "Размер", c_entry: "Вход", c_mark: "Сейчас", close: "Закрыть",
+    pnl_note: "PnL по текущей цене, без учёта funding.",
+    framed: "Страница открыта во фрейме — торговля отключена. Открой perps-lens напрямую.",
+    loading: "Загрузка…", no_pos: "Открытых позиций нет.", unavailable: "{venue} недоступна:",
+    close_confirm: "Подтвердить: закрыть {size} {coin} на {venue}", cancel: "Отмена",
+    band_off: "НЕ ПОДКЛЮЧЕНО", band_real: "РЕАЛЬНЫЕ ДЕНЬГИ", band_demo: "DEMO · ТОЛЬКО ПРОСМОТР", band_test: "TESTNET · ТЕСТОВЫЕ СРЕДСТВА",
+    order: "Ордер", size: "Размер", unit_aria: "Единица размера",
+    hint_coin: "≈ {usd} · мин. {min} · шаг {step}{cap}", hint_usd: "= {qty} {coin} · ≈ {usd} · мин. {min} · шаг {step}{cap}",
+    hint_cap: " · лимит Mainnet ${cap}",
+    e_framed: "Торговля во фрейме отключена.", e_connect: "Подключи {venue} кнопкой «Подключить» вверху.",
+    e_demo: "Binance Demo: ордера из браузера не принимаются (CORS) — только просмотр. Торговля — на Mainnet.",
+    e_nomarket: "Нет данных рынка — обнови позже.", e_stale: "Цены устарели — обновляю…",
+    e_size: "Укажи размер больше нуля.", e_mark: "Нет цены рынка — обнови позже.",
+    e_lot: "Размер меньше минимального лота {min}.", e_notional: "Минимальный ордер — ${min}. Увеличь размер.",
+    e_cap: "На Mainnet ордер ограничен ${cap}: сейчас ≈ ${usd}.", e_usd_low: "Меньше минимума: {min} {coin} ≈ {usd}.",
+    t_idle: "Подключи биржу во вкладке «Аккаунты».", t_ready: "Рыночный ордер. На Mainnet сначала будет подтверждение.",
+    s_sign: "{venue}: подтверди ордер в Phantom…", s_sending: "{venue}: отправляю ордер…",
+    s_done: "{venue}: {what} — {side} {qty} {coin}{at}{id}.",
+    st_filled: "исполнен", st_accepted: "принят", st_other: "статус {status}", st_close: "закрытие", st_at: " по {px}",
+    s_unknown: "{venue}: исход неизвестен ({msg}) — проверь позиции ниже.",
+    confirm: "{venue} · MAINNET — реальные деньги.\n{side} {qty} {coin} ≈ {usd}.\nОтправить ордер?",
+    e_bad_response: "Неожиданный ответ биржи", e_wallet_cancel: "Отменено в кошельке.",
+    connecting: "Подключаюсь…", disconnected: "Отключено.",
+    ph_idle: "Подключи Phantom, чтобы торговать. Каждый ордер подписывается в кошельке.",
+    ph_on: "Подключено · {addr} · ордера подписываются в Phantom", bn_on: "Подключено · {net}",
+    ph_missing: "Phantom не найден: установи расширение Phantom (phantom.com) и обнови страницу. Как локальный файл страница не работает — только через http(s).",
+    ph_rejected: "Подключение отменено.", ph_switched: "Кошелёк в Phantom сменился — подключи Phantom заново.",
+    ph_connect: "Подключить Phantom", disconnect: "Отключить", connect: "Подключить",
+    ph_warn: "Только отдельный пустой кошелёк.", ph_more: "Почему и где взять тестовые средства",
+    ph_li1: "Подпись Pacifica не указывает сеть и 30 секунд действительна и на mainnet, поэтому не подписывай здесь кошельком с реальным депозитом на Pacifica.",
+    ph_li2: 'Тестовые средства: devnet SOL и USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).',
+    bn_sub: "API-ключ · Futures", bn_net_aria: "Сеть Binance",
+    bn_idle: "Вставь ключ, чтобы увидеть баланс и торговать.", bn_need: "Вставь API Key и Secret Key.",
+    bn_warn: "Только право Futures, без Withdraw.", bn_main_warn: "Mainnet: ордера исполняются на реальные деньги.",
+    bn_more: "Подробнее про ключ",
+    bn_li1: "Ключ живёт только в памяти этой вкладки и пропадает при её закрытии.",
+    bn_li2: "На Mainnet ключ без IP-ограничения торговать не сможет, пока включены Default Security Controls.",
+    bn_li3: 'Demo-ключ: <a href="https://demo.binance.com" target="_blank" rel="noopener">demo.binance.com</a> → API Management; на Demo видны баланс и позиции, ордера из браузера Demo-сервер не принимает.',
+    "bn_h-2014": "Неверный API-ключ (или ключ от другой сети: Demo и Mainnet — разные ключи).",
+    "bn_h-2015_demo": "Ключ отклонён: Demo-ключ создаётся на demo.binance.com (Mainnet — на binance.com), нужно право Futures, а если у ключа есть список IP — твой IP должен быть в нём.",
+    "bn_h-2015_main": "Ключ отклонён: нужно право Futures. На реальном аккаунте Default Security Controls Binance запрещают торговлю ключам без IP-ограничения — привяжи ключ к своему IP или отключи эту защиту.",
+    "bn_h-1022": "Неверный Secret Key.", "bn_h-1021": "Часы компьютера расходятся с биржей — переподключись.",
+    "bn_h-2019": "Недостаточно маржи: на счёте USDⓈ-M Futures не хватает USDT. Mainnet — переведи USDT в Wallet → Transfer → USDⓈ-M Futures; Demo — счёт появляется после первого захода в раздел фьючерсов на demo.binance.com.",
+    "bn_h-4061": "На аккаунте включён Hedge Mode — переключи на One-way в настройках фьючерсов.",
+    bn_h451: "Binance недоступен из твоего региона.",
+    fd_h: "Funding: Pacifica vs Binance", fd_unit: "% за 8ч · только просмотр",
+    fd_sub: "Funding — периодический платёж между лонгами и шортами. Лонг там, где дешевле, шорт там, где выше: позиция нейтральна к цене и зарабатывает спред.",
+    fd_mkt: "Рынок", fd_spread: "Спред", fd_long: "Лонг дешевле на", fd_same: "одинаково",
+    fd_updated: "Обновлено {time}. Топ-10 рынков Pacifica по объёму за 24ч, которые есть и на Binance.",
+    fd_err: "Не удалось обновить funding: {msg}. Показаны последние данные.",
+    fd_foot: "Публичные данные Pacifica mainnet и Binance · обновляется раз в минуту, пока открыта вкладка · не совет. Положительная ставка — платят лонги.",
+    ov_h: "Обзор рынка Pacifica", ov_ro: "mainnet · только просмотр",
+    ov_sub: "Ончейн-перпы на Solana рядом с твоей CEX. Живые данные Pacifica, только просмотр, без ключей.", ticker_aria: "Цены Pacifica",
+    st_vol: "объём Pacifica за 24ч", st_markets: "рынков", st_tradfi: "из них не крипта: акции, сырьё, валюты",
+    wp_h: "Позиции кошелька", wp_ph: "Solana-адрес кошелька", wp_btn: "Показать", wp_note: "Введи адрес или кликни трейдера в таблице ниже.",
+    wp_mkt: "Рынок", wp_vol: "Объём", wp_total: "Итого нереализованный PnL", wp_pnl_note: "PnL по текущей цене, без учёта накопленного funding.",
+    wp_fail: "Не удалось загрузить: {msg}", err: "Ошибка: {msg}",
+    lb_h: "Топ трейдеров Pacifica", lb_trader: "Трейдер", lb_30: "PnL 30д", lb_all: "PnL всё время", lb_vol: "Объём 30д", lb_eq: "Капитал",
+    lb_note: "Кликни трейдера, чтобы увидеть его позиции. 🔒 — трейдер скрыл позиции.",
+    tf_h: "Не только крипта", tf_stocks: "Акции", tf_comm: "Сырьё", tf_fx: "Валюты и индексы",
+    footer: "Ключи бирж остаются в этой вкладке и уходят только на биржу",
+  },
+  uk: {
+    tagline: "Угода з усіх боків", net_real: "MAINNET — РЕАЛЬНІ ГРОШІ", off: "не підключена", tabs_aria: "Розділи",
+    tab_trade: "Торгівля", tab_accounts: "Підключення", conn_sub: "Кожна біржа підключається у своїй мережі", close_aria: "Закрити", tab_market: "Ринок", tab_screener: "Скринер",
+    sc_h: "Скринер: Binance USDT-M", sc_unit: "наживо · лише перегляд", sc_sub: "Усі ф'ючерси Binance в одній таблиці: ціна, funding, open interest, CVD і ліквідації. Сортуй за будь-якою колонкою; натисни на монету, щоб перенести її в тікет.",
+    sc_ph: "Знайти монету", sc_coin: "Монета", sc_price: "Ціна", sc_chg: "24 год", sc_vol: "Обсяг 24 год", sc_fund: "Funding", sc_liq: "Лікв. 1 год",
+    sc_state: "Показано {n} з {total} · оновлено {time}", sc_more: "Решта — через пошук.", sc_none: "Немає такої монети.", sc_err: "Скринер недоступний: {msg}",
+    sc_go: "Відкрити {coin} у тікеті", sc_foot: "Дані: сервіс скринера PantheonX поверх публічних потоків Binance · не порада. Зміна OI у %, CVD і ліквідації в $.",
+    empty_h: "Підключи біржу", empty_p: "Тут з'являться баланси, позиції та ордер. Спершу підключи Phantom (Pacifica) або API-ключ Binance.",
+    empty_btn: "Підключити біржу →",
+    portfolio: "Портфель", updated: "оновлено {time}", available: "доступно {amt} · {unit}",
+    c_venue: "Біржа", c_coin: "Монета", c_side: "Сторона", c_size: "Розмір", c_entry: "Вхід", c_mark: "Зараз", close: "Закрити",
+    pnl_note: "PnL за поточною ціною, без урахування funding.",
+    framed: "Сторінку відкрито у фреймі, тому торгівлю вимкнено. Відкрий perps-lens напряму.",
+    loading: "Завантаження…", no_pos: "Відкритих позицій немає.", unavailable: "{venue} недоступна:",
+    close_confirm: "Підтвердити: закрити {size} {coin} на {venue}", cancel: "Скасувати",
+    band_off: "НЕ ПІДКЛЮЧЕНО", band_real: "РЕАЛЬНІ ГРОШІ", band_demo: "DEMO · ЛИШЕ ПЕРЕГЛЯД", band_test: "TESTNET · ТЕСТОВІ КОШТИ",
+    order: "Ордер", size: "Розмір", unit_aria: "Одиниця розміру",
+    hint_coin: "≈ {usd} · мін. {min} · крок {step}{cap}", hint_usd: "= {qty} {coin} · ≈ {usd} · мін. {min} · крок {step}{cap}",
+    hint_cap: " · ліміт Mainnet ${cap}",
+    e_framed: "У фреймі торгівлю вимкнено.", e_connect: "Підключи {venue} кнопкою «Підключити» вгорі.",
+    e_demo: "Binance Demo не приймає ордери з браузера (CORS), тож лише перегляд. Торгувати можна на Mainnet.",
+    e_nomarket: "Немає даних ринку, спробуй трохи згодом.", e_stale: "Ціни застаріли, оновлюю…",
+    e_size: "Вкажи розмір більший за нуль.", e_mark: "Немає ціни ринку, спробуй трохи згодом.",
+    e_lot: "Розмір менший за мінімальний лот {min}.", e_notional: "Мінімальний ордер — ${min}. Збільш розмір.",
+    e_cap: "На Mainnet ордер обмежено ${cap}: зараз ≈ ${usd}.", e_usd_low: "Менше за мінімум: {min} {coin} ≈ {usd}.",
+    t_idle: "Підключи біржу у вкладці «Акаунти».", t_ready: "Ринковий ордер. На Mainnet спершу буде підтвердження.",
+    s_sign: "{venue}: підтверди ордер у Phantom…", s_sending: "{venue}: надсилаю ордер…",
+    s_done: "{venue}: {what} — {side} {qty} {coin}{at}{id}.",
+    st_filled: "виконано", st_accepted: "прийнято", st_other: "статус {status}", st_close: "закриття", st_at: " за {px}",
+    s_unknown: "{venue}: результат невідомий ({msg}). Перевір позиції нижче.",
+    confirm: "{venue} · MAINNET — реальні гроші.\n{side} {qty} {coin} ≈ {usd}.\nНадіслати ордер?",
+    e_bad_response: "Неочікувана відповідь біржі", e_wallet_cancel: "Скасовано в гаманці.",
+    connecting: "Підключаюся…", disconnected: "Відключено.",
+    ph_idle: "Підключи Phantom, щоб торгувати. Кожен ордер підписується в гаманці.",
+    ph_on: "Підключено · {addr} · ордери підписуються в Phantom", bn_on: "Підключено · {net}",
+    ph_missing: "Phantom не знайдено: встанови розширення Phantom (phantom.com) і онови сторінку. Як локальний файл сторінка не працює, лише через http(s).",
+    ph_rejected: "Підключення скасовано.", ph_switched: "У Phantom змінився гаманець. Підключи Phantom знову.",
+    ph_connect: "Підключити Phantom", disconnect: "Відключити", connect: "Підключити",
+    ph_warn: "Лише окремий порожній гаманець.", ph_more: "Чому так і де взяти тестові кошти",
+    ph_li1: "Підпис Pacifica не вказує мережу і ще 30 секунд дійсний на mainnet, тож не підписуй тут гаманцем, на якому є реальний депозит Pacifica.",
+    ph_li2: 'Тестові кошти: devnet SOL і USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).',
+    bn_sub: "API-ключ · Futures", bn_net_aria: "Мережа Binance",
+    bn_idle: "Встав ключ, щоб бачити баланс і торгувати.", bn_need: "Встав API Key і Secret Key.",
+    bn_warn: "Лише право Futures, без Withdraw.", bn_main_warn: "Mainnet: ордери виконуються на реальні гроші.",
+    bn_more: "Докладніше про ключ",
+    bn_li1: "Ключ живе лише в пам'яті цієї вкладки і зникає, щойно її закрити.",
+    bn_li2: "На Mainnet ключ без IP-обмеження не зможе торгувати, поки ввімкнені Default Security Controls.",
+    bn_li3: 'Demo-ключ: <a href="https://demo.binance.com" target="_blank" rel="noopener">demo.binance.com</a> → API Management; на Demo видно баланс і позиції, але ордери з браузера Demo-сервер не приймає.',
+    "bn_h-2014": "Неправильний API-ключ (або ключ від іншої мережі: Demo і Mainnet мають різні ключі).",
+    "bn_h-2015_demo": "Ключ відхилено: Demo-ключ створюють на demo.binance.com (Mainnet — на binance.com), потрібне право Futures, а якщо в ключа є список IP, твій IP має бути в ньому.",
+    "bn_h-2015_main": "Ключ відхилено: потрібне право Futures. На реальному акаунті Default Security Controls від Binance забороняють торгівлю ключам без IP-обмеження: прив'яжи ключ до свого IP або вимкни цей захист.",
+    "bn_h-1022": "Неправильний Secret Key.", "bn_h-1021": "Годинник комп'ютера розходиться з біржею. Перепідключись.",
+    "bn_h-2019": "Недостатньо маржі: на рахунку USDⓈ-M Futures бракує USDT. Mainnet: переказ USDT через Wallet → Transfer → USDⓈ-M Futures. Demo: рахунок з'являється після першого входу в розділ ф'ючерсів на demo.binance.com.",
+    "bn_h-4061": "На акаунті ввімкнено Hedge Mode. Перемкни на One-way у налаштуваннях ф'ючерсів.",
+    bn_h451: "Binance недоступний у твоєму регіоні.",
+    fd_h: "Funding: Pacifica vs Binance", fd_unit: "% за 8 год · лише перегляд",
+    fd_sub: "Funding — періодичний платіж між лонгами та шортами. Лонг там, де дешевше, шорт там, де вище: позиція нейтральна до ціни й заробляє спред.",
+    fd_mkt: "Ринок", fd_spread: "Спред", fd_long: "Лонг дешевший на", fd_same: "однаково",
+    fd_updated: "Оновлено {time}. Топ-10 ринків Pacifica за обсягом за 24 год, які є і на Binance.",
+    fd_err: "Не вдалося оновити funding: {msg}. Показано останні дані.",
+    fd_foot: "Публічні дані Pacifica mainnet і Binance · оновлюється щохвилини, поки відкрита вкладка · не порада. Додатна ставка — платять лонги.",
+    ov_h: "Огляд ринку Pacifica", ov_ro: "mainnet · лише перегляд",
+    ov_sub: "Ончейн-перпи на Solana поруч із твоєю CEX. Живі дані Pacifica, лише перегляд, без ключів.", ticker_aria: "Ціни Pacifica",
+    st_vol: "обсяг Pacifica за 24 год", st_markets: "ринків", st_tradfi: "з них не крипта: акції, сировина, валюти",
+    wp_h: "Позиції гаманця", wp_ph: "Solana-адреса гаманця", wp_btn: "Показати", wp_note: "Введи адресу або клікни трейдера в таблиці нижче.",
+    wp_mkt: "Ринок", wp_vol: "Обсяг", wp_total: "Разом нереалізований PnL", wp_pnl_note: "PnL за поточною ціною, без урахування накопиченого funding.",
+    wp_fail: "Не вдалося завантажити: {msg}", err: "Помилка: {msg}",
+    lb_h: "Топ трейдерів Pacifica", lb_trader: "Трейдер", lb_30: "PnL 30д", lb_all: "PnL за весь час", lb_vol: "Обсяг 30д", lb_eq: "Капітал",
+    lb_note: "Клікни трейдера, щоб побачити його позиції. 🔒 — трейдер приховав позиції.",
+    tf_h: "Не лише крипта", tf_stocks: "Акції", tf_comm: "Сировина", tf_fx: "Валюти та індекси",
+    footer: "Ключі бірж залишаються в цій вкладці й ідуть лише на біржу",
+  },
+};
+const LOCALE = { en: "en-GB", ru: "ru-RU", uk: "uk-UA" };
+let lang = "en";
+try { lang = localStorage.getItem("pl-lang") || "en"; } catch {}
+if (!I18N[lang]) lang = "en";
+const t = (k, v = {}) => (I18N[lang][k] ?? I18N.en[k] ?? k).replace(/\{(\w+)\}/g, (_, n) => v[n] ?? "");
+const time = d => d.toLocaleTimeString(LOCALE[lang]);
+
+const api = pacificaApi(PACIFICA.mainnet); // overview + funding: read-only mainnet data
+const bnPublic = binance({ base: BASES.mainnet }); // public endpoints only, no key
+// Non-crypto markets on Pacifica, grouped for display (keys are dictionary keys).
 const TRADFI = {
-  "Акции": ["NVDA", "TSLA", "GOOGL", "META", "PLTR", "HOOD", "MSTR", "CRCL", "MU", "SNDK", "SAMSUNG", "SKHYNIX", "SPCX"],
-  "Сырьё": ["XAU", "XAG", "PLATINUM", "COPPER", "CL", "NATGAS", "URNM"],
-  "Валюты и индексы": ["EURUSD", "USDJPY", "SP500"],
+  tf_stocks: ["NVDA", "TSLA", "GOOGL", "META", "PLTR", "HOOD", "MSTR", "CRCL", "MU", "SNDK", "SAMSUNG", "SKHYNIX", "SPCX"],
+  tf_comm: ["XAU", "XAG", "PLATINUM", "COPPER", "CL", "NATGAS", "URNM"],
+  tf_fx: ["EURUSD", "USDJPY", "SP500"],
 };
 
-let marks = {}, markets = {}, trader = null;
-
-async function api(path) {
-  const r = await fetch(`${API}/${path}`);
-  const body = await r.json();
-  if (!body.success) throw new Error(body.error || r.status);
-  return body.data;
-}
+let marks = {}, trader = null;
 
 const usd = (n, d = 0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
 const compact = n => "$" + Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 const cls = n => (n >= 0 ? "up" : "down");
 const short = a => a.slice(0, 4) + "…" + a.slice(-4);
 const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+const chgSpan = p => { const chg = (+p.mark / +p.yesterday_price - 1) * 100; return `<span class="${cls(chg)}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</span>`; };
+
+// ---- Market overview (read-only). Data is cached so a language switch re-renders without refetching.
+let prices = null, pricesErr = null, leaders = null, leadersErr = null, wp = { kind: "idle" };
 
 async function loadMarkets() {
-  const prices = await api("info/prices");
+  prices = await api("info/prices");
   marks = Object.fromEntries(prices.map(p => [p.symbol, +p.mark]));
-  const bySym = Object.fromEntries(prices.map(p => [p.symbol, p]));
-  const tradfi = Object.values(TRADFI).flat().filter(s => bySym[s]);
-  document.getElementById("s-vol").textContent = compact(prices.reduce((a, p) => a + +p.volume_24h, 0));
-  document.getElementById("s-markets").textContent = prices.length;
-  document.getElementById("s-tradfi").textContent = tradfi.length;
-
-  document.getElementById("tradfi").innerHTML = Object.entries(TRADFI).map(([name, syms]) => `
-    <div class="group"><h3>${name}</h3>${syms.filter(s => bySym[s]).map(s => {
-      const p = bySym[s], chg = (+p.mark / +p.yesterday_price - 1) * 100;
-      return `<div class="chip"><span>${s}</span><span>${(+p.mark).toLocaleString("en-US")} <span class="${cls(chg)}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</span></span></div>`;
-    }).join("")}</div>`).join("");
-  document.getElementById("tradfi").classList.remove("note");
+  const tradfi = Object.values(TRADFI).flat().filter(s => marks[s] !== undefined);
+  $("s-vol").textContent = compact(prices.reduce((a, p) => a + +p.volume_24h, 0));
+  $("s-markets").textContent = prices.length;
+  $("s-tradfi").textContent = tradfi.length;
+  const ticks = [...prices].sort((a, b) => b.volume_24h - a.volume_24h).slice(0, 14)
+    .map(p => `<div class="tick"><span>${esc(p.symbol)}</span><b>${(+p.mark).toLocaleString("en-US")}</b>${chgSpan(p)}</div>`).join("");
+  $("ticker").innerHTML = `<div class="track"><div>${ticks}</div><div aria-hidden="true">${ticks}</div></div>`;
+  renderTradfi();
 }
 
-async function loadLeaders() {
-  const rows = await api("leaderboard?limit=10");
-  document.getElementById("leaders").innerHTML = `<table>
-    <tr><th>Трейдер</th><th>PnL 30д</th><th>PnL всё время</th><th>Объём 30д</th><th>Капитал</th></tr>
-    ${rows.map(r => `<tr class="${r.privacy_mode ? "" : "click"}" data-addr="${r.privacy_mode ? "" : esc(r.address)}">
+function renderTradfi() {
+  const el = $("tradfi");
+  if (pricesErr) { el.textContent = t("err", { msg: pricesErr.message }); return; }
+  if (!prices) { el.textContent = t("loading"); return; }
+  const bySym = Object.fromEntries(prices.map(p => [p.symbol, p]));
+  el.innerHTML = Object.entries(TRADFI).map(([key, syms]) => `
+    <div class="group"><h3>${esc(t(key))}</h3>${syms.filter(s => bySym[s]).map(s =>
+      `<div class="chip"><span>${s}</span><span>${(+bySym[s].mark).toLocaleString("en-US")} ${chgSpan(bySym[s])}</span></div>`).join("")}</div>`).join("");
+  el.classList.remove("note");
+}
+
+async function loadLeaders() { leaders = await api("leaderboard?limit=10"); renderLeaders(); }
+
+function renderLeaders() {
+  const el = $("leaders");
+  if (leadersErr) { el.textContent = t("err", { msg: leadersErr.message }); return; }
+  if (!leaders) { el.textContent = t("loading"); return; }
+  el.innerHTML = `<table>
+    <tr><th>${esc(t("lb_trader"))}</th><th>${esc(t("lb_30"))}</th><th>${esc(t("lb_all"))}</th><th>${esc(t("lb_vol"))}</th><th>${esc(t("lb_eq"))}</th></tr>
+    ${leaders.map(r => `<tr class="${r.privacy_mode ? "" : "click"}" data-addr="${r.privacy_mode ? "" : esc(r.address)}">
       <td>${esc(r.username || short(r.address))}${r.privacy_mode ? ' <span class="muted">🔒</span>' : ""}</td>
       <td class="${cls(+r.pnl_30d)}">${usd(+r.pnl_30d)}</td>
       <td class="${cls(+r.pnl_all_time)}">${usd(+r.pnl_all_time)}</td>
       <td>${compact(+r.volume_30d)}</td>
       <td>${compact(+r.equity_current)}</td></tr>`).join("")}
-  </table><p class="note">Кликни трейдера, чтобы увидеть его позиции. 🔒 — трейдер скрыл позиции.</p>`;
-  document.querySelectorAll("tr.click").forEach(tr => tr.onclick = () => {
-    document.getElementById("wallet").value = tr.dataset.addr;
+  </table><p class="note">${esc(t("lb_note"))}</p>`;
+  el.querySelectorAll("tr.click").forEach(tr => tr.onclick = () => {
+    $("wallet").value = tr.dataset.addr;
     showPositions(tr.dataset.addr);
-    document.getElementById("wallet").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("wallet").scrollIntoView({ behavior: "smooth", block: "center" });
   });
 }
 
 async function showPositions(wallet) {
-  const out = document.getElementById("positions");
-  out.className = "note";
-  out.textContent = "Загрузка…";
+  wp = { kind: "loading" }; renderWallet();
   try {
     const rows = await api(`positions?account=${encodeURIComponent(wallet)}`);
-    if (!rows.length) { out.textContent = "Открытых позиций нет."; return; }
-    let total = 0;
-    const canClose = TESTNET && wallet === trader;
-    const body = rows.map(p => {
-      const size = +p.amount, entry = +p.entry_price, mark = marks[p.symbol] ?? entry;
-      const long = p.side === "bid", pnl = (mark - entry) * size * (long ? 1 : -1);
-      total += pnl;
-      const close = canClose ? `<td><button class="small" data-sym="${esc(p.symbol)}" data-side="${long ? "ask" : "bid"}" data-amt="${esc(p.amount)}">Закрыть</button></td>` : "";
-      return `<tr><td>${esc(p.symbol)}</td><td class="${long ? "up" : "down"}">${long ? "long" : "short"}</td>
-        <td>${size.toLocaleString("en-US")}</td><td>${compact(size * mark)}</td>
-        <td>${entry.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
-        <td>${mark.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
-        <td class="${cls(pnl)}">${usd(pnl, 2)}</td>${close}</tr>`;
-    }).join("");
-    out.className = "";
-    out.innerHTML = `<table>
-      <tr><th>Рынок</th><th>Сторона</th><th>Размер</th><th>Объём</th><th>Вход</th><th>Сейчас</th><th>PnL</th>${canClose ? "<th></th>" : ""}</tr>
-      ${body}
-      <tr><td colspan="6"><b>Итого нереализованный PnL</b></td><td class="${cls(total)}"><b>${usd(total, 2)}</b></td>${canClose ? "<td></td>" : ""}</tr>
-    </table><p class="note">PnL по текущей цене, без учёта накопленного funding.</p>`;
-    out.querySelectorAll("[data-sym]").forEach(b => b.onclick = () => placeOrder(b.dataset.sym, b.dataset.side, b.dataset.amt, true));
+    wp = { kind: "rows", rows };
   } catch (e) {
-    out.textContent = "Не удалось загрузить: " + e.message;
+    wp = { kind: "error", e };
   }
+  renderWallet();
+}
+
+function renderWallet() {
+  const out = $("positions");
+  out.className = "note";
+  if (wp.kind === "idle") return (out.textContent = t("wp_note"));
+  if (wp.kind === "loading") return (out.textContent = t("loading"));
+  if (wp.kind === "error") return (out.textContent = t("wp_fail", { msg: wp.e.message }));
+  if (!wp.rows.length) return (out.textContent = t("no_pos"));
+  let total = 0;
+  const body = wp.rows.map(p => {
+    const size = +p.amount, entry = +p.entry_price, mark = marks[p.symbol] ?? entry;
+    const long = p.side === "bid", pnl = (mark - entry) * size * (long ? 1 : -1);
+    total += pnl;
+    return `<tr><td>${esc(p.symbol)}</td><td class="${long ? "up" : "down"}">${long ? "long" : "short"}</td>
+      <td>${size.toLocaleString("en-US")}</td><td>${compact(size * mark)}</td>
+      <td>${entry.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
+      <td>${mark.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
+      <td class="${cls(pnl)}">${usd(pnl, 2)}</td></tr>`;
+  }).join("");
+  out.className = "";
+  const h = ["wp_mkt", "c_side", "c_size", "wp_vol", "c_entry", "c_mark"].map(k => `<th>${esc(t(k))}</th>`).join("");
+  out.innerHTML = `<table>
+    <tr>${h}<th>PnL</th></tr>
+    ${body}
+    <tr><td colspan="6"><b>${esc(t("wp_total"))}</b></td><td class="${cls(total)}"><b>${usd(total, 2)}</b></td></tr>
+  </table><p class="note">${esc(t("wp_pnl_note"))}</p>`;
 }
 
 document.getElementById("f").onsubmit = e => {
@@ -190,61 +881,482 @@ document.getElementById("f").onsubmit = e => {
   if (w) showPositions(w);
 };
 
-const status = t => document.getElementById("o-status").textContent = t;
+// ---- Funding: Pacifica vs Binance, % per 8h. Refreshed every 60 s while the Market tab is visible.
+let fund = { rows: null, at: null, err: null };
 
-async function placeOrder(symbol, side, amount, reduce_only) {
-  if (API !== TEST_API) throw new Error("Trading is testnet-only");
-  const m = markets[symbol], lot = +m.lot_size, dec = (m.lot_size.split(".")[1] || "").length;
-  amount = (Math.floor(+amount / lot + 1e-9) * lot).toFixed(dec);
-  if (!reduce_only && !(+amount * (marks[symbol] || 0) >= +m.min_order_size))
-    return status(`Минимальный ордер — $${m.min_order_size}. Увеличь размер.`);
-  status("Подтверди ордер в Phantom…");
+async function loadFunding() {
   try {
-    const data = { symbol, amount, side, slippage_percent: document.getElementById("o-slip").value.trim() || "0.5",
-      reduce_only, client_order_id: crypto.randomUUID() };
-    const body = await signedBody({ type: "create_market_order", data, account: trader,
-      signMessage: async msg => (await window.phantom.solana.signMessage(msg, "utf8")).signature });
-    const r = await fetch(`${TEST_API}/orders/create_market`, { method: "POST",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const res = await r.json();
-    status(res.success ? `Ордер принят: ${reduce_only ? "закрытие" : side === "bid" ? "long" : "short"} ${amount} ${symbol}.`
-      : "Pacifica отклонила: " + res.error);
+    const [p, premium, info] = await Promise.all([api("info/prices"), bnPublic.premiumIndex(), bnPublic.fundingInfo()]);
+    fund = { rows: fundingRows({ prices: p, premium, info }), at: new Date(), err: null };
   } catch (e) {
-    status(e.code === 4001 ? "Отменено в кошельке." : "Ошибка: " + e.message);
+    fund = { ...fund, err: e }; // keep the last table
   }
-  showPositions(trader);
+  renderFunding();
 }
 
-async function initTrading() {
-  document.getElementById("net").hidden = false;
-  document.getElementById("trade").hidden = false;
-  document.getElementById("sub").textContent = "Testnet Pacifica: ордера подписываются в твоём Phantom, ключи не покидают кошелёк.";
-  markets = Object.fromEntries((await api("info")).map(m => [m.symbol, m]));
-  document.getElementById("o-symbol").innerHTML = Object.keys(markets).sort()
-    .map(s => `<option${s === "SOL" ? " selected" : ""}>${esc(s)}</option>`).join("");
-  document.getElementById("connect").onclick = async () => {
+function renderFunding() {
+  const r4 = r => +r.toFixed(4); // no "−0.0000%"
+  const rate = r => `${r4(r) > 0 ? "+" : r4(r) < 0 ? "−" : ""}${Math.abs(r).toFixed(4)}%`;
+  const rc = r => (r4(r) > 0 ? "pos-rate" : "neg-rate");
+  $("fd-rows").innerHTML = (fund.rows ?? []).map(r => {
+    const v = r.cheaperLong, long = !v ? esc(t("fd_same"))
+      : `<span class="venue ${v === "binance" ? "bn" : "pac"}"><svg class="logo" aria-hidden="true"><use href="#logo-${v}"/></svg> ${NAME[v]}</span>`;
+    return `<tr><td class="coin">${esc(r.coin)}</td>
+      <td data-label="Pacifica" class="${rc(r.pac)}">${rate(r.pac)}</td>
+      <td data-label="Binance" class="${rc(r.bn)}">${rate(r.bn)}</td>
+      <td data-label="${esc(t("fd_spread"))}">${Math.abs(r.spread).toFixed(4)}%</td>
+      <td data-label="≈ APR" class="apr">${r.apr.toFixed(1)}%</td>
+      <td class="long">${long}</td></tr>`;
+  }).join("");
+  $("fd-state").textContent = fund.at ? t("fd_updated", { time: time(fund.at) }) : fund.err ? "" : t("loading");
+  $("fd-err").hidden = !fund.err;
+  $("fd-err").textContent = fund.err ? t("fd_err", { msg: fund.err.message }) : "";
+}
+
+// ---- Venues: one state per exchange, one portfolio. The secret lives only inside the `binance` client closure.
+const FRAMED = top !== self; // clickjacking: never offer trading inside a frame
+const NAME = { pacifica: "Pacifica", binance: "Binance" };
+const BRAND = { pacifica: "pac", binance: "bn" };
+const NET_SHORT = { testnet: "TESTNET", demo: "DEMO", mainnet: "MAINNET" };
+const netLabel = net => (net === "mainnet" ? t("net_real") : NET_SHORT[net]);
+const UNIT = { pacifica: "USDP", binance: "USDT-M" };
+const BN_HINTS = ["-2014", "-2015", "-1022", "-1021", "-2019", "-4061", "451"]; // dictionary keys bn_h<code>
+const netClass = net => (net === "mainnet" ? "real" : "test");
+const logo = (id, lg = "") => `<svg class="logo${lg}" aria-hidden="true"><use href="#logo-${id}"/></svg>`;
+const venues = { pacifica: null, binance: null };
+const blank = () => ({ balance: null, positions: [], markets: [], error: null, at: 0 });
+const state = { pacifica: blank(), binance: blank() }; // state[id].error holds the Error; text is built at render time
+const $ = id => document.getElementById(id);
+let updatedAt = null;
+let ticketVenue = document.querySelector("input[name=t-venue]:checked").value; // the browser may restore the radio on reload
+let wantCoin = null; // coin picked on the Screener tab, applied once the ticket's venue lists it
+let unit = "usd"; // ticket size entered in dollars ("usd") or coins ("coin")
+
+const load = async v => {
+  const [balance, positions, markets] = await Promise.all([v.balance(), v.positions(), v.markets()]);
+  return { balance, positions, markets, error: null, at: Date.now() };
+};
+
+async function refresh(id) {
+  const v = venues[id];
+  if (!v) { state[id] = blank(); return render(); }
+  try {
+    const s = await load(v);
+    if (venues[id] === v) { state[id] = s; updatedAt = new Date(); }
+  } catch (e) {
+    if (venues[id] === v) state[id] = { ...state[id], error: e };
+  }
+  render();
+}
+
+const msgOf = e => (e.code === "bad-response" ? t("e_bad_response") : e.message);
+
+function errorText(id, e) {
+  if (id === "pacifica" && e.code === 4001) return t("e_wallet_cancel");
+  let hint = "";
+  if (id === "binance" && BN_HINTS.includes(String(e.code))) {
+    const net = venues.binance?.net ?? $("bn-net").value;
+    hint = t("bn_h" + e.code + (String(e.code) === "-2015" ? (net === "mainnet" ? "_main" : "_demo") : "")) + " ";
+  }
+  return `${hint}${NAME[id]}: ${e.code ?? ""} ${msgOf(e)}`;
+}
+
+function render() { renderBadges(); renderTabs(); renderPortfolio(); renderTicket(); renderAccounts(); paintStatus(); }
+
+function renderBadges() {
+  const b = $("conn"), on = ["pacifica", "binance"].filter(id => venues[id]);
+  b.hidden = FRAMED;
+  b.className = "conn" + (on.length ? " on" : "");
+  b.setAttribute("aria-label", on.length ? t("tab_accounts") + ": " + on.map(id => NAME[id] + " " + NET_SHORT[venues[id].net]).join(", ") : t("connect"));
+  b.innerHTML = on.length
+    ? on.map(id => `<span class="chip ${netClass(venues[id].net)}" title="${NAME[id]}">${logo(id)}${esc(NET_SHORT[venues[id].net])}</span>`).join("") + (on.length < 2 ? `<span class="plus" aria-hidden="true">+</span>` : "")
+    : esc(t("connect"));
+}
+
+function renderTabs() {
+  const on = ["pacifica", "binance"].filter(id => venues[id]);
+  const n = on.reduce((a, id) => a + state[id].positions.length, 0);
+  $("tab-count").hidden = !n;
+  $("tab-count").textContent = n;
+  $("trade-empty").hidden = FRAMED || on.length > 0;
+  $("top").hidden = !FRAMED && !on.length;
+}
+
+const sgn = n => (n >= 0 ? "+" : "") + usd(n, 2);
+const px = n => n.toLocaleString("en-US", { maximumFractionDigits: 4 });
+
+let armed = null, armTimer; // "binance:SOL" while the row shows the confirm button
+
+function renderPortfolio() {
+  const on = ["pacifica", "binance"].filter(id => venues[id]);
+  $("updated").textContent = updatedAt ? t("updated", { time: time(updatedAt) }) : "";
+  $("balances").innerHTML = on.filter(id => state[id].balance).map(id => {
+    const v = venues[id], b = state[id].balance;
+    return `<div class="bal ${BRAND[id]}"><h3><span class="who">${logo(id, " lg")} ${NAME[id]}</span><span class="net ${netClass(v.net)}">${esc(NET_SHORT[v.net])}</span></h3>
+      <b>${usd(b.wallet, 2)}</b><span>${esc(t("available", { amt: usd(b.available, 2), unit: UNIT[id] }))}</span></div>`;
+  }).join("");
+  let rows = "";
+  for (const id of ["pacifica", "binance"]) {
+    const v = venues[id], s = state[id];
+    if (!v) continue;
+    for (const p of s.positions) {
+      const size = +p.size, long = p.side === "long";
+      rows += `<tr class="pos" role="row"><td role="cell"><span class="venue ${BRAND[id]}">${logo(id)} ${NAME[id]} <i class="${netClass(v.net)}">${esc(NET_SHORT[v.net])}</i></span></td>
+        <td role="cell" class="coin">${esc(p.coin)}</td><td role="cell" class="side ${long ? "up" : "down"}">${long ? "long" : "short"}</td>
+        <td role="cell" data-label="${esc(t("c_size"))}">${esc(p.size)}</td><td role="cell" data-label="≈$">${compact(size * p.mark)}</td>
+        <td role="cell" data-label="${esc(t("c_entry"))}">${esc(px(p.entry))}</td><td role="cell" data-label="${esc(t("c_mark"))}">${esc(px(p.mark))}</td>
+        <td role="cell" data-label="PnL" class="${cls(p.upnl)}">${esc(sgn(p.upnl))}</td>
+        <td role="cell" class="close-cell">${closeCell(id, p)}</td></tr>`;
+    }
+    if (s.error) rows += `<tr class="fail" role="row"><td role="cell" colspan="9"><b>${esc(t("unavailable", { venue: NAME[id] }))}</b> ${esc(errorText(id, s.error))}</td></tr>`;
+  }
+  $("pos-rows").innerHTML = rows;
+  $("pos-wrap").hidden = !rows;
+  $("pos-note").hidden = !!rows;
+  $("pos-note").textContent = !on.length ? "" : on.every(id => state[id].balance) ? t("no_pos") : t("loading");
+}
+
+// stale positions after a failed refresh must not be closable from the screen
+const closeBlocked = id => FRAMED || busy[id] || !venues[id]?.canTrade || !!state[id].error;
+const disarm = () => { armed = null; clearTimeout(armTimer); };
+
+function closeCell(id, p) {
+  const key = esc(id + ":" + p.coin), off = closeBlocked(id);
+  if (id + ":" + p.coin === armed)
+    return `<button type="button" class="small danger" data-confirm="${key}"${off ? " disabled" : ""}>${esc(t("close_confirm", { size: p.size, coin: p.coin, venue: NAME[id] }))}</button> <button type="button" class="small ghost" data-cancel>${esc(t("cancel"))}</button>`;
+  return `<button type="button" class="small ghost" data-close="${key}"${off ? " disabled" : ""}>${esc(t("close"))}</button>`;
+}
+
+const staleKick = { pacifica: false, binance: false }; // one guard-triggered refresh at a time
+
+// Errors are returned as thunks so the text follows the current language when repainted.
+function ticketCheck(reduceOnly = false) {
+  const v = venues[ticketVenue], m = state[ticketVenue].markets.find(x => x.coin === $("t-coin").value);
+  if (FRAMED) return { error: () => t("e_framed") };
+  if (!v) { const venue = NAME[ticketVenue]; return { error: () => t("e_connect", { venue }) }; }
+  if (!v.canTrade) return { error: () => t("e_demo") };
+  if (!m) return { error: () => t("e_nomarket") };
+  if (!reduceOnly && (state[ticketVenue].error || Date.now() - state[ticketVenue].at > STALE_MS)) {
+    if (!staleKick[ticketVenue]) { staleKick[ticketVenue] = true; refresh(ticketVenue).finally(() => (staleKick[ticketVenue] = false)); }
+    const id = ticketVenue, err = state[id].error;
+    return { error: () => (err ? errorText(id, err) : t("e_stale")) };
+  }
+  let size = $("t-size").value;
+  if (unit === "usd") { // dollars -> coins first; every check below runs on the rounded qty × mark
+    size = usdToQty({ usd: size, mark: m.mark, step: m.step });
+    if (size === null) return { error: () => t(m.mark > 0 ? "e_size" : "e_mark") };
+    if (+size < +m.min) return { error: () => t("e_usd_low", { min: m.min, coin: m.coin, usd: usd(+m.min * m.mark, 2) }) };
+  }
+  const c = checkOrder({ size, mark: m.mark, step: m.step, min: m.min, minNotional: m.minNotional, net: v.net, reduceOnly });
+  return c.error ? { error: () => t(c.key, c.vars) } : { ...c, m, v };
+}
+
+function renderTicket() {
+  const v = venues[ticketVenue], tk = $("ticket"), band = $("t-band");
+  tk.className = "ticket " + (v ? netClass(v.net) : "off");
+  band.className = "band " + (v ? netClass(v.net) : "off");
+  band.textContent = t(!v ? "band_off" : v.net === "mainnet" ? "band_real" : v.net === "demo" ? "band_demo" : "band_test");
+  const coins = state[ticketVenue].markets.map(m => m.coin).sort();
+  const sel = $("t-coin"), key = coins.join(",");
+  if (sel.dataset.key !== key) { // rebuild only when the list changed, so an open select is not reset every refresh
+    const keep = sel.value || "SOL";
+    sel.innerHTML = coins.map(c => `<option>${esc(c)}</option>`).join("");
+    sel.value = coins.includes(keep) ? keep : coins.includes("SOL") ? "SOL" : coins[0] ?? "";
+    sel.dataset.key = key;
+  }
+  if (wantCoin && coins.length) { if (coins.includes(wantCoin)) sel.value = wantCoin; wantCoin = null; } // picked on the Screener tab; dropped if this venue lacks it
+  $("u-coin").textContent = sel.value || "COIN";
+  for (const b of document.querySelectorAll("#t-unit button")) b.setAttribute("aria-pressed", b.dataset.unit === unit);
+  const c = ticketCheck();
+  $("t-hint").classList.toggle("bad", !!c.error);
+  $("t-hint").textContent = c.error ? c.error() : t(unit === "usd" ? "hint_usd" : "hint_coin", { qty: c.qty, coin: sel.value,
+    usd: usd(c.notional, 2), min: c.m.min, step: c.m.step, cap: c.v.net === "mainnet" ? t("hint_cap", { cap: MAINNET_CAP }) : "" });
+  for (const a of document.querySelectorAll(".sides .amt")) a.textContent = c.error ? "" : `${c.qty} ${sel.value}`;
+  $("t-long").disabled = $("t-short").disabled = !!c.error || busy[ticketVenue];
+}
+
+const tStatus = fn => { msg.ticket = fn; paintStatus(); };
+
+async function placeOrder(id, coin, side, qty, reduceOnly) {
+  const v = venues[id];
+  if (!v || busy[id]) return; // one order in flight per venue: a double click must not send two
+  busy[id] = true; render();
+  tStatus(() => t(id === "pacifica" ? "s_sign" : "s_sending", { venue: NAME[id] }));
+  try {
+    const o = await v.marketOrder(coin, side, qty, reduceOnly);
+    tStatus(() => t("s_done", { venue: NAME[id],
+      what: o.status === "FILLED" ? t("st_filled") : o.status === "ACCEPTED" ? t("st_accepted") : t("st_other", { status: o.status }),
+      side: reduceOnly ? t("st_close") : side, qty: o.filled, coin,
+      at: o.avgPrice ? t("st_at", { px: o.avgPrice }) : "", id: o.id ? ` · #${o.id}` : "" }));
+  } catch (e) {
+    // network failure, timeout, or an unreadable 2xx reply: the order may or may not have reached the exchange
+    const unknown = unknownOutcome(e);
+    tStatus(() => (unknown ? t("s_unknown", { venue: NAME[id], msg: msgOf(e) }) : errorText(id, e)));
+  } finally {
+    if (venues[id] === v) busy[id] = false;
+  }
+  await refresh(id);
+}
+
+function submit(side) {
+  const c = ticketCheck();
+  if (c.error) return tStatus(c.error);
+  const coin = $("t-coin").value;
+  if (c.v.net === "mainnet" && !confirm(t("confirm", { venue: NAME[ticketVenue], side: side === "long" ? "Long" : "Short",
+      qty: c.qty, coin, usd: usd(c.notional, 2) }))) return;
+  const again = ticketCheck(); // confirm() blocks the page: the mark may have gone stale while it was open
+  if (again.error) return tStatus(again.error);
+  if (again.qty !== c.qty) return renderTicket(); // the size changed under the dialog: show the new one, send nothing
+  placeOrder(ticketVenue, coin, side, c.qty, false);
+}
+
+// ---- Accounts: every connect/disconnect bumps a generation, so a slow stale connect cannot resurrect itself.
+const gen = { pacifica: 0, binance: 0 };
+const busy = { pacifica: false, binance: false };
+const statusEl = { pacifica: $("ph-status"), binance: $("bn-status") };
+const msg = { pacifica: () => t("ph_idle"), binance: () => t("bn_idle"), ticket: () => t(venues.pacifica || venues.binance ? "t_ready" : "t_idle") }; // status lines as thunks
+const good = { pacifica: false, binance: false };
+const setStatus = (id, fn, ok = false) => { msg[id] = fn; good[id] = ok; paintStatus(); };
+
+function paintStatus() {
+  for (const id of ["pacifica", "binance"]) { statusEl[id].textContent = msg[id](); statusEl[id].classList.toggle("ok", good[id]); }
+  $("t-status").textContent = msg.ticket();
+}
+
+function renderAccounts() {
+  for (const id of ["pacifica", "binance"]) {
+    const v = venues[id], b = $("acc-badge-" + id);
+    b.className = "badge " + (v ? netClass(v.net) : "off");
+    b.textContent = v ? netLabel(v.net) : t("off");
+  }
+  $("ph-connect").hidden = !!venues.pacifica;
+  $("ph-disconnect").hidden = !venues.pacifica;
+  $("bn-fields").hidden = $("bn-connect").hidden = !!venues.binance;
+  $("bn-disconnect").hidden = !venues.binance;
+}
+
+function disconnect(id) {
+  disarm(); gen[id]++; venues[id] = null; busy[id] = false; state[id] = blank();
+  if (id === "pacifica") trader = null;
+  setStatus(id, () => t("disconnected"));
+  render();
+}
+
+async function connect(id, makeVenue) {
+  disarm();
+  const g = ++gen[id];
+  venues[id] = null; busy[id] = false; state[id] = blank(); render();
+  setStatus(id, () => t("connecting"));
+  try {
+    const v = await makeVenue();
+    if (g !== gen[id]) return; // a newer connect or a disconnect won; drop this one
+    venues[id] = v;
+    if (!venues[ticketVenue]) { // point the ticket at the venue just connected, not at an empty one
+      ticketVenue = id;
+      document.querySelector(`input[name=t-venue][value=${id}]`).checked = true;
+    }
+    const addr = id === "pacifica" && trader ? short(trader) : "";
+    setStatus(id, () => t(id === "pacifica" ? "ph_on" : "bn_on", { addr, net: netLabel(v.net) }), true);
+    show("trade");
+    await refresh(id);
+  } catch (e) {
+    if (g === gen[id]) setStatus(id, () => errorText(id, e));
+  }
+}
+
+if (FRAMED) {
+  $("ticket-col").hidden = true;
+  $("top").classList.add("framed");
+  $("framed-note").hidden = false;
+  $("pos-note").hidden = true;
+} else {
+  $("ph-connect").onclick = async () => {
     const phantom = window.phantom?.solana;
-    if (!phantom?.isPhantom) return status("Phantom не найден: установи расширение Phantom (phantom.com) и обнови страницу. Как локальный файл страница не работает — только через http(s).");
+    if (!phantom?.isPhantom) return setStatus("pacifica", () => t("ph_missing"));
+    let account;
     try {
-      trader = (await phantom.connect()).publicKey.toString();
-    } catch { return status("Подключение отменено."); }
-    document.getElementById("wallet").value = trader;
-    document.getElementById("connect").textContent = short(trader);
-    status("Кошелёк подключён. Выбери рынок, сторону и размер.");
-    showPositions(trader);
+      account = (await phantom.connect()).publicKey.toString();
+    } catch { return setStatus("pacifica", () => t("ph_rejected")); }
+    trader = account;
+    connect("pacifica", async () => pacificaVenue({ account, signMessage: async m => (await window.phantom.solana.signMessage(m, "utf8")).signature }));
   };
-  document.getElementById("order").onsubmit = e => {
-    e.preventDefault();
-    if (!trader) return status("Сначала подключи Phantom.");
-    const size = document.getElementById("o-size").value.trim().replace(",", ".");
-    if (!(+size > 0)) return status("Укажи размер больше нуля.");
-    placeOrder(document.getElementById("o-symbol").value, document.getElementById("o-side").value, size, false);
+  $("ph-disconnect").onclick = () => disconnect("pacifica");
+
+  const bnNetSel = $("bn-net");
+  const showWarn = () => $("bn-warn").hidden = bnNetSel.value !== "mainnet";
+  showWarn(); // the browser may restore Mainnet on reload
+  bnNetSel.onchange = () => { showWarn(); disconnect("binance"); };
+  $("bn-disconnect").onclick = () => disconnect("binance");
+  $("bn-connect").onclick = () => {
+    const key = $("bn-key").value.trim(), secret = $("bn-secret").value.trim();
+    if (!key || !secret) return setStatus("binance", () => t("bn_need"));
+    $("bn-secret").value = "";
+    const net = bnNetSel.value;
+    connect("binance", async () => {
+      const v = await binanceVenue(binance({ base: BASES[net], key, secret }), net);
+      await v.balance(); // public endpoints accept any key: prove the key before the venue counts as connected
+      return v;
+    });
   };
+  $("t-venue").onchange = e => { ticketVenue = e.target.value; renderTicket(); };
+  $("t-size").oninput = renderTicket;
+  $("t-coin").onchange = renderTicket;
+  $("t-unit").onclick = e => {
+    const b = e.target.closest("[data-unit]");
+    if (!b || b.dataset.unit === unit) return;
+    const c = ticketCheck(); // carry a valid size over to the other unit
+    unit = b.dataset.unit;
+    // round $ up so converting back floors to the same qty; on error clear, or "40" would silently change meaning
+    $("t-size").value = c.error ? "" : unit === "usd" ? (Math.ceil(c.notional * 100) / 100).toFixed(2) : c.qty;
+    renderTicket();
+  };
+  $("t-long").onclick = () => submit("long");
+  $("t-short").onclick = () => submit("short");
+  $("positions-all").onclick = e => {
+    const b = e.target.closest("[data-close],[data-confirm],[data-cancel]");
+    if (!b || b.disabled) return;
+    clearTimeout(armTimer);
+    if (b.dataset.close) { armed = b.dataset.close; armTimer = setTimeout(() => { armed = null; renderPortfolio(); }, 5000); }
+    else if (b.dataset.confirm) {
+      const [id, coin] = b.dataset.confirm.split(":"), p = state[id].positions.find(x => x.coin === coin);
+      armed = null;
+      if (p && !closeBlocked(id)) placeOrder(id, coin, p.side === "long" ? "short" : "long", p.size, true);
+    } else armed = null;
+    if (b.dataset.close && closeBlocked(b.dataset.close.split(":")[0])) disarm();
+    renderPortfolio();
+  };
+  window.phantom?.solana?.on?.("accountChanged", () => {
+    if (!venues.pacifica) return;
+    disconnect("pacifica");
+    setStatus("pacifica", () => t("ph_switched"));
+  });
 }
 
-if (TESTNET) initTrading().catch(e => status("Ошибка: " + e.message));
-loadMarkets().catch(e => document.getElementById("tradfi").textContent = "Ошибка: " + e.message);
-loadLeaders().catch(e => document.getElementById("leaders").textContent = "Ошибка: " + e.message);
+// ---- Screener: a /dashboard snapshot, then live patches over SSE while the tab is open.
+const SC_COLS = [ // key, header (i18n key or literal), value getter
+  ["coin", "sc_coin", r => r.coin], ["price", "sc_price", r => r.ohlcv?.close_latest],
+  ["chg", "sc_chg", r => (r.ohlcv?.close_24h ? (r.ohlcv.close_latest / r.ohlcv.close_24h - 1) * 100 : undefined)],
+  ["vol", "sc_vol", r => r.quote_volume_24h], ["fund", "sc_fund", r => (r.funding ? r.funding.close_latest * 100 : undefined)],
+  ["oi1", "OI 1h", r => r.oi?.ointerest_1h], ["oi4", "OI 4h", r => r.oi?.ointerest_4h], ["oi24", "OI 24h", r => r.oi?.ointerest_24h],
+  ["cvd1", "CVD 1h", r => r.cvd?.cvd_1h], ["cvd4", "CVD 4h", r => r.cvd?.cvd_4h], ["liq", "sc_liq", r => r.liquidations?.total_turnover_1h],
+];
+const SC_MAX = 100; // rows on screen; the rest are a search away
+const sc = { rows: null, at: null, err: null, es: null, dirty: false, sort: "vol", dir: -1, q: "" };
+
+async function openScreener() {
+  if (sc.es) return;
+  const es = sc.es = new EventSource(SCREENER + "/stream/dashboard");
+  es.addEventListener("dashboard_update", e => {
+    if (!sc.rows) return; // patches before the snapshot are covered by it
+    for (const { code, patch } of JSON.parse(e.data).updates) {
+      const r = sc.rows[code];
+      if (!r) continue;
+      for (const [k, v] of Object.entries(patch)) r[k] = v && typeof v === "object" ? { ...r[k], ...v } : v;
+    }
+    sc.at = new Date(); sc.dirty = true;
+  });
+  try {
+    const res = await fetch(SCREENER + "/dashboard");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const rows = await res.json();
+    if (sc.es !== es) return; // tab left (or reopened) while loading
+    sc.rows = rows; sc.at = new Date(); sc.err = null;
+  } catch (e) { if (sc.es === es) sc.err = e; }
+  renderScreener();
+}
+function closeScreener() { sc.es?.close(); sc.es = null; sc.rows = null; } // reopening takes a fresh snapshot
+
+const pct = (n, d = 2) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(d) + "%";
+const sMoney = n => (n > 0 ? "+" : n < 0 ? "−" : "") + compact(Math.abs(n));
+function scCell(key, v, r) {
+  if (v === undefined || v === null || Number.isNaN(v)) return ["", "—"];
+  switch (key) {
+    case "price": { const d = Math.min(Math.max(r.precision | 0, 0), 8); return ["", v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })]; }
+    case "vol": case "liq": return ["", compact(v)];
+    case "fund": return [cls(-v), pct(v, 4)]; // positive funding = longs pay
+    case "cvd1": case "cvd4": return [cls(v), sMoney(v)];
+    default: return [cls(v), pct(v)];
+  }
+}
+
+function renderScreener() {
+  const label = h => (h.startsWith("sc_") ? t(h) : h);
+  $("sc-head").innerHTML = SC_COLS.map(([k, h]) => `<th${k === sc.sort ? ` aria-sort="${sc.dir < 0 ? "descending" : "ascending"}"` : ""}><button type="button" data-sort="${k}">${esc(label(h))}${k === sc.sort ? (sc.dir < 0 ? " ↓" : " ↑") : ""}</button></th>`).join("");
+  const all = Object.values(sc.rows ?? {}), q = sc.q.trim().toUpperCase();
+  const get = SC_COLS.find(c => c[0] === sc.sort)[2];
+  const rows = all.filter(r => !q || r.coin.includes(q)).sort((a, b) => {
+    const x = get(a), y = get(b);
+    if (x == null || y == null) return (x == null) - (y == null); // blanks last either way
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * sc.dir;
+  });
+  $("sc-rows").innerHTML = rows.slice(0, SC_MAX).map(r => "<tr>" + SC_COLS.map(([k, h, g]) => {
+    if (k === "coin") return `<td class="coin"><button type="button" data-coin="${esc(r.coin)}" title="${esc(t("sc_go", { coin: r.coin }))}">${esc(r.coin)}</button></td>`;
+    const [c, txt] = scCell(k, g(r), r);
+    return `<td class="${c}" data-label="${esc(label(h))}">${esc(txt)}</td>`;
+  }).join("") + "</tr>").join("");
+  $("sc-state").textContent = sc.err ? t("sc_err", { msg: sc.err.message }) : !sc.rows ? t("loading")
+    : !rows.length ? t("sc_none")
+    : t("sc_state", { n: Math.min(rows.length, SC_MAX), total: rows.length, time: time(sc.at) }) + (rows.length > SC_MAX ? " " + t("sc_more") : "");
+  sc.dirty = false;
+}
+setInterval(() => { if (sc.dirty && tab === "screener") renderScreener(); }, 1000); // patches arrive every ~100 ms
+$("sc-q").addEventListener("input", e => { sc.q = e.target.value; renderScreener(); });
+$("sc-table").addEventListener("click", e => {
+  const s = e.target.closest("[data-sort]"), c = e.target.closest("[data-coin]");
+  if (s) { const k = s.dataset.sort; sc.dir = k === sc.sort ? -sc.dir : k === "coin" ? 1 : -1; sc.sort = k; renderScreener(); }
+  if (c) { wantCoin = c.dataset.coin; show("trade"); renderTicket(); window.scrollTo(0, 0); }
+});
+
+// ---- Tabs. The current tab lives in the URL hash (survives a reload, no storage).
+const TABS = ["trade", "market", "screener", "order-flow"];
+const SCREENER = "https://pantheon-screener-service-47a52e37ec37.herokuapp.com"; // PantheonX's service: their server, our screen
+const NEXUS = SCREENER + "/nexus";
+let tab = null;
+function openConn() { if (!FRAMED && !$("conn-dlg").open) $("conn-dlg").showModal(); }
+$("conn-x").addEventListener("click", () => $("conn-dlg").close());
+$("conn-dlg").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); }); // backdrop click
+function show(name) {
+  if (name === "accounts") return openConn();
+  tab = name;
+  for (const b of document.querySelectorAll("#tabs [data-tab]")) b.setAttribute("aria-selected", b.dataset.tab === name);
+  for (const p of document.querySelectorAll("[role=tabpanel]")) p.hidden = p.id !== "tab-" + name;
+  history.replaceState(null, "", location.pathname + location.search + "#" + name);
+  if (name === "screener") openScreener(); else closeScreener();
+  if (name === "order-flow" && !$("nexus").src) $("nexus").src = NEXUS + "/?api=" + encodeURIComponent(NEXUS); // load only when first opened
+  if (name === "market" && (!fund.at || Date.now() - fund.at > 60000)) loadFunding();
+}
+document.addEventListener("click", e => {
+  const lb = e.target.closest("[data-lang]");
+  if (lb) return applyLang(lb.dataset.lang);
+  const el = e.target.closest("[data-tab],[data-go]");
+  if (!el) return;
+  e.preventDefault();
+  if (el.dataset.go === "accounts") return openConn();
+  show(el.dataset.tab || el.dataset.go);
+  window.scrollTo(0, 0);
+});
+
+function applyLang(l) {
+  lang = I18N[l] ? l : "en";
+  try { localStorage.setItem("pl-lang", lang); } catch {}
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll("[data-i18n-html]")) el.innerHTML = t(el.dataset.i18nHtml); // static dictionary links only
+  for (const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = t(el.dataset.i18nPh);
+  for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  for (const b of document.querySelectorAll("#lang button")) b.setAttribute("aria-pressed", b.dataset.lang === lang);
+  render(); renderTradfi(); renderLeaders(); renderWallet(); renderFunding(); renderScreener();
+}
+
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { refresh("pacifica"); refresh("binance"); } });
+setInterval(() => { if (document.visibilityState === "visible") { refresh("pacifica"); refresh("binance"); } }, 15000);
+setInterval(() => { if (tab === "market" && document.visibilityState === "visible") loadFunding(); }, 60000);
+
+applyLang(lang);
+const fromHash = location.hash.slice(1);
+show(TABS.includes(fromHash) ? fromHash : "trade"); // first visit: the empty Trade card points at Connect
+loadMarkets().catch(e => { pricesErr = e; renderTradfi(); });
+loadLeaders().catch(e => { leadersErr = e; renderLeaders(); });
 </script>
 </body>
 </html>
