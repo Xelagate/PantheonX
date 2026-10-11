@@ -152,6 +152,8 @@
   tr.fail b { color: var(--down); }
   .note { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
   .note b { color: var(--warn); }
+  .soon { display: inline-block; margin: 0 0 10px; padding: 6px 12px; border: 1px dashed var(--accent-hi); border-radius: 999px; color: var(--muted); font-size: 13px; }
+  .soon b { color: var(--head); }
 
   input, select { width: 100%; min-width: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--deep); color: var(--head);
     font: 600 14px Montserrat, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
@@ -525,6 +527,7 @@
     <section class="panel" id="screener">
       <div class="panel-head"><h2 data-i18n="sc_h"></h2><span data-i18n="sc_unit"></span></div>
       <p class="sub" data-i18n="sc_sub"></p>
+      <p class="soon" id="sc-soon" data-i18n-html="sc_soon"></p>
       <input id="sc-q" type="search" autocomplete="off" spellcheck="false" data-i18n-ph="sc_ph" data-i18n-aria="sc_ph">
       <div class="scroll">
         <table id="sc-table">
@@ -558,7 +561,7 @@ const I18N = {
     sc_h: "Screener: Binance USDT-M", sc_unit: "live · read-only", sc_sub: "Every Binance perp in one table: price, funding, open interest, CVD and liquidations. Sort by any column; tap a coin to put it in the order ticket.",
     sc_ph: "Find a coin", sc_coin: "Coin", sc_price: "Price", sc_chg: "24h", sc_vol: "Volume 24h", sc_fund: "Funding", sc_liq: "Liq. 1h",
     sc_state: "Showing {n} of {total} · updated {time}", sc_more: "Search to find the rest.", sc_none: "No coin matches.", sc_err: "Screener unavailable: {msg}",
-    sc_go: "Open {coin} in the order ticket", sc_foot: "Data: PantheonX screener service over Binance public streams · not advice. OI change in %, CVD and liquidations in $.",
+    sc_soon: "<b>Next: price charts</b> right here, so the trader never leaves for another app.", sc_go: "Open {coin} in the order ticket", sc_foot: "Data: PantheonX screener service over Binance public streams · not advice. OI change in %, CVD and liquidations in $.",
     empty_h: "Connect an exchange", empty_p: "Balances, positions and the order ticket show up here. Connect Phantom (Pacifica) or a Binance API key first.",
     empty_btn: "Connect an exchange →",
     portfolio: "Portfolio", updated: "updated {time}", available: "available {amt} · {unit}",
@@ -631,7 +634,7 @@ const I18N = {
     sc_h: "Скринер: Binance USDT-M", sc_unit: "онлайн · только просмотр", sc_sub: "Все фьючерсы Binance в одной таблице: цена, funding, open interest, CVD и ликвидации. Сортируй по любой колонке; нажми на монету, чтобы перенести её в тикет.",
     sc_ph: "Найти монету", sc_coin: "Монета", sc_price: "Цена", sc_chg: "24ч", sc_vol: "Объём 24ч", sc_fund: "Funding", sc_liq: "Ликв. 1ч",
     sc_state: "Показано {n} из {total} · обновлено {time}", sc_more: "Остальные — через поиск.", sc_none: "Нет такой монеты.", sc_err: "Скринер недоступен: {msg}",
-    sc_go: "Открыть {coin} в тикете", sc_foot: "Данные: сервис скринера PantheonX поверх публичных потоков Binance · не совет. Изменение OI в %, CVD и ликвидации в $.",
+    sc_soon: "<b>Скоро: графики цены</b> прямо здесь — не нужно уходить в другое приложение.", sc_go: "Открыть {coin} в тикете", sc_foot: "Данные: сервис скринера PantheonX поверх публичных потоков Binance · не совет. Изменение OI в %, CVD и ликвидации в $.",
     empty_h: "Подключи биржу", empty_p: "Здесь будут балансы, позиции и ордер. Сначала подключи Phantom (Pacifica) или API-ключ Binance.",
     empty_btn: "Подключить биржу →",
     portfolio: "Портфель", updated: "обновлено {time}", available: "доступно {amt} · {unit}",
@@ -704,7 +707,7 @@ const I18N = {
     sc_h: "Скринер: Binance USDT-M", sc_unit: "наживо · лише перегляд", sc_sub: "Усі ф'ючерси Binance в одній таблиці: ціна, funding, open interest, CVD і ліквідації. Сортуй за будь-якою колонкою; натисни на монету, щоб перенести її в тікет.",
     sc_ph: "Знайти монету", sc_coin: "Монета", sc_price: "Ціна", sc_chg: "24 год", sc_vol: "Обсяг 24 год", sc_fund: "Funding", sc_liq: "Лікв. 1 год",
     sc_state: "Показано {n} з {total} · оновлено {time}", sc_more: "Решта — через пошук.", sc_none: "Немає такої монети.", sc_err: "Скринер недоступний: {msg}",
-    sc_go: "Відкрити {coin} у тікеті", sc_foot: "Дані: сервіс скринера PantheonX поверх публічних потоків Binance · не порада. Зміна OI у %, CVD і ліквідації в $.",
+    sc_soon: "<b>Незабаром: графіки ціни</b> просто тут — не треба йти в інший застосунок.", sc_go: "Відкрити {coin} у тікеті", sc_foot: "Дані: сервіс скринера PantheonX поверх публічних потоків Binance · не порада. Зміна OI у %, CVD і ліквідації в $.",
     empty_h: "Підключи біржу", empty_p: "Тут з'являться баланси, позиції та ордер. Спершу підключи Phantom (Pacifica) або API-ключ Binance.",
     empty_btn: "Підключити біржу →",
     portfolio: "Портфель", updated: "оновлено {time}", available: "доступно {amt} · {unit}",
