@@ -96,6 +96,9 @@
   #tabs button:active { transform: none; }
   #tabs button[aria-selected="true"] { color: var(--head); box-shadow: inset 0 -2px 0 var(--accent-hi); }
   #tabs .count { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; background: var(--deep); color: var(--muted); }
+  #tabs .step { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--deep); color: var(--muted); font-size: 11px; font-weight: 800; }
+  #tabs button[aria-selected="true"] .step { background: var(--accent-hi); color: var(--head); }
+  .flow { margin: -8px 0 16px; color: var(--muted); font-size: 13px; }
   #tabs .alert { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-hi); }
 
   /* Layout: portfolio left, sticky ticket right; one column below 1000px with the portfolio first. */
@@ -311,7 +314,8 @@
     .conn { order: 2; margin-left: auto; }
     #lang button { min-height: 38px; padding: 4px 9px; }
     #tabs .wrap { gap: 0; }
-    #tabs button { flex: 1 1 0; justify-content: center; padding: 0 6px; font-size: 14px; }
+    #tabs button { flex: 1 1 0; justify-content: center; gap: 5px; padding: 0 4px; font-size: 13px; }
+    #tabs .step { width: 17px; height: 17px; font-size: 10px; flex: none; }
     .panel { padding: 16px; }
     .scroll { margin: 0 -16px; padding: 0 16px; }
     #balances { grid-template-columns: 1fr; }
@@ -365,14 +369,15 @@
 
 <nav id="tabs" data-i18n-aria="tabs_aria">
   <div class="wrap" role="tablist">
-    <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
-    <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span data-i18n="tab_market"></span></button>
-    <button type="button" role="tab" data-tab="screener" aria-controls="tab-screener"><span data-i18n="tab_screener"></span></button>
-    <button type="button" role="tab" data-tab="order-flow" aria-controls="tab-order-flow" title="Nexus Flow by PantheonX">Order Flow</button>
+    <button type="button" role="tab" data-tab="screener" aria-controls="tab-screener"><span class="step">1</span><span data-i18n="tab_screener"></span></button>
+    <button type="button" role="tab" data-tab="order-flow" aria-controls="tab-order-flow" title="Nexus Flow by PantheonX"><span class="step">2</span>Order Flow</button>
+    <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span class="step">3</span><span data-i18n="tab_market"></span></button>
+    <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span class="step">4</span><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
   </div>
 </nav>
 
 <main class="wrap">
+  <p class="flow" data-i18n="flow"></p>
   <div id="tab-trade" role="tabpanel" hidden>
     <section class="panel empty-card has-theon" id="trade-empty" hidden>
       <img class="theon" src="img/theon-cyan.webp" width="132" height="240" alt="">
@@ -547,6 +552,7 @@ import { fundingRows } from "./funding.js";
 // data-i18n-ph -> placeholder, data-i18n-aria -> aria-label. Dynamic text goes through t() at render time.
 const I18N = {
   en: {
+    flow: "Spot a signal in the Screener → check the order flow → compare funding → trade it in one ticket. Tap any coin to send it to the ticket.",
     tagline: "Every side of the trade", net_real: "MAINNET — REAL MONEY", off: "not connected", tabs_aria: "Sections",
     tab_trade: "Trade", tab_accounts: "Connections", conn_sub: "Each exchange connects on its own network", close_aria: "Close", tab_market: "Market", tab_screener: "Screener",
     sc_h: "Screener: Binance USDT-M", sc_unit: "live · read-only", sc_sub: "Every Binance perp in one table: price, funding, open interest, CVD and liquidations. Sort by any column; tap a coin to put it in the order ticket.",
@@ -619,6 +625,7 @@ const I18N = {
     footer: "Your exchange keys stay in this tab and go only to the exchange",
   },
   ru: {
+    flow: "Найдите сигнал в скринере → проверьте поток ордеров → сравните фандинг → торгуйте в одном тикете. Нажмите на монету — она попадёт в тикет.",
     tagline: "Сделка со всех сторон", net_real: "MAINNET — РЕАЛЬНЫЕ ДЕНЬГИ", off: "не подключена", tabs_aria: "Разделы",
     tab_trade: "Торговля", tab_accounts: "Подключения", conn_sub: "Каждая биржа подключается в своей сети", close_aria: "Закрыть", tab_market: "Рынок", tab_screener: "Скринер",
     sc_h: "Скринер: Binance USDT-M", sc_unit: "онлайн · только просмотр", sc_sub: "Все фьючерсы Binance в одной таблице: цена, funding, open interest, CVD и ликвидации. Сортируй по любой колонке; нажми на монету, чтобы перенести её в тикет.",
@@ -691,6 +698,7 @@ const I18N = {
     footer: "Ключи бирж остаются в этой вкладке и уходят только на биржу",
   },
   uk: {
+    flow: "Знайдіть сигнал у скринері → перевірте потік ордерів → порівняйте фандинг → торгуйте в одному тікеті. Натисніть на монету — вона потрапить у тікет.",
     tagline: "Угода з усіх боків", net_real: "MAINNET — РЕАЛЬНІ ГРОШІ", off: "не підключена", tabs_aria: "Розділи",
     tab_trade: "Торгівля", tab_accounts: "Підключення", conn_sub: "Кожна біржа підключається у своїй мережі", close_aria: "Закрити", tab_market: "Ринок", tab_screener: "Скринер",
     sc_h: "Скринер: Binance USDT-M", sc_unit: "наживо · лише перегляд", sc_sub: "Усі ф'ючерси Binance в одній таблиці: ціна, funding, open interest, CVD і ліквідації. Сортуй за будь-якою колонкою; натисни на монету, щоб перенести її в тікет.",
@@ -1308,7 +1316,7 @@ $("sc-table").addEventListener("click", e => {
 });
 
 // ---- Tabs. The current tab lives in the URL hash (survives a reload, no storage).
-const TABS = ["trade", "market", "screener", "order-flow"];
+const TABS = ["screener", "order-flow", "market", "trade"];
 const SCREENER = "https://pantheon-screener-service-47a52e37ec37.herokuapp.com"; // PantheonX's service: their server, our screen
 const NEXUS = SCREENER + "/nexus";
 let tab = null;
@@ -1354,7 +1362,7 @@ setInterval(() => { if (tab === "market" && document.visibilityState === "visibl
 
 applyLang(lang);
 const fromHash = location.hash.slice(1);
-show(TABS.includes(fromHash) ? fromHash : "trade"); // first visit: the empty Trade card points at Connect
+show(TABS.includes(fromHash) ? fromHash : "screener"); // first visit lands on live data, no connection needed
 loadMarkets().catch(e => { pricesErr = e; renderTradfi(); });
 loadLeaders().catch(e => { leadersErr = e; renderLeaders(); });
 </script>
